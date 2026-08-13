@@ -1,0 +1,288 @@
+:host {
+  display: block;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+header p,
+aside > small,
+.modal-head small {
+  font-size: 11px;
+  letter-spacing: 1.3px;
+  color: #087f8c;
+  font-weight: 800;
+}
+header h1 {
+  margin: 5px 0;
+}
+header span,
+aside > p {
+  color: #718096;
+}
+button {
+  border: 0;
+  background: #087f8c;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+section {
+  background: #fff;
+  border: 1px solid #e5ebef;
+  border-radius: 14px;
+  margin-top: 22px;
+  overflow: hidden;
+}
+.stats {
+  display: flex;
+  gap: 55px;
+  padding: 20px;
+}
+.stats div {
+  display: grid;
+  gap: 5px;
+}
+.stats small {
+  font-size: 10px;
+  color: #718096;
+}
+.stats b {
+  font-size: 21px;
+}
+.table {
+  overflow: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  padding: 14px 17px;
+  border-top: 1px solid #edf1f3;
+  font-size: 13px;
+  white-space: nowrap;
+}
+th {
+  color: #718096;
+  background: #fafcfd;
+}
+tbody tr {
+  cursor: pointer;
+}
+.status {
+  display: inline-block;
+  background: #fff4dd;
+  color: #9a6700;
+  border-radius: 20px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.status.complete {
+  background: #e5f7ee;
+  color: #067647;
+}
+.state,
+.empty {
+  text-align: center;
+  padding: 55px;
+  color: #718096;
+}
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: #0b253355;
+  z-index: 30;
+}
+aside {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: min(480px, 92vw);
+  background: #fff;
+  z-index: 31;
+  padding: 28px;
+  overflow: auto;
+  box-shadow: -10px 0 35px #102a3a22;
+}
+aside .close,
+.modal-head .close {
+  float: right;
+  background: #edf2f4;
+  color: #333;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 20px;
+}
+aside h2 {
+  margin: 8px 0 4px;
+}
+.meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 25px 0;
+}
+.meta span {
+  display: grid;
+  gap: 5px;
+  background: #f7f9fa;
+  padding: 12px;
+  border-radius: 9px;
+  font-size: 11px;
+  color: #718096;
+}
+.meta b {
+  color: #24343d;
+}
+.detail-line,
+.grand {
+  display: flex;
+  justify-content: space-between;
+  padding: 13px 0;
+  border-top: 1px solid #edf1f3;
+}
+.detail-line span {
+  display: grid;
+  gap: 4px;
+}
+.detail-line small {
+  color: #718096;
+}
+.grand {
+  font-size: 18px;
+}
+.notes {
+  background: #f7f9fa;
+  border-radius: 9px;
+  padding: 13px;
+  margin-top: 15px;
+}
+.notes small {
+  font-weight: 800;
+  color: #718096;
+}
+footer {
+  display: flex;
+  gap: 9px;
+  justify-content: flex-end;
+  padding: 18px 0;
+}
+.secondary {
+  background: #edf2f4;
+  color: #40515b;
+}
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: #0b2533aa;
+  display: grid;
+  place-items: center;
+  z-index: 40;
+  padding: 18px;
+}
+.backdrop form {
+  background: #fff;
+  width: min(920px, 100%);
+  max-height: 92vh;
+  overflow: auto;
+  border-radius: 16px;
+}
+.modal-head {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e7ecef;
+  display: flex;
+  justify-content: space-between;
+}
+.modal-head h2 {
+  margin: 4px 0;
+}
+.form-body {
+  padding: 22px;
+}
+.base-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+.base-fields .wide {
+  grid-column: 1/-1;
+}
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+input,
+select,
+textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid #d8e1e7;
+  border-radius: 8px;
+  padding: 10px;
+  font: inherit;
+}
+.items-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin: 24px 0 8px;
+}
+.items-head div {
+  display: grid;
+  gap: 4px;
+}
+.items-head span {
+  font-size: 11px;
+  color: #718096;
+}
+.items-head button {
+  background: transparent;
+  color: #087f8c;
+  font-weight: 700;
+}
+.order-line {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 36px;
+  align-items: end;
+  gap: 9px;
+  padding: 11px 0;
+  border-top: 1px solid #edf1f3;
+}
+.order-line > button {
+  height: 38px;
+  padding: 0;
+  background: #edf2f4;
+  color: #40515b;
+}
+.backdrop form > footer {
+  border-top: 1px solid #e7ecef;
+  padding: 16px 22px;
+}
+@media (max-width: 650px) {
+  header span {
+    display: none;
+  }
+  .stats {
+    gap: 25px;
+  }
+  .base-fields,
+  .order-line {
+    grid-template-columns: 1fr;
+  }
+  .base-fields .wide {
+    grid-column: auto;
+  }
+  .order-line > button {
+    width: 38px;
+  }
+}

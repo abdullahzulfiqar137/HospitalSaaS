@@ -1,0 +1,129 @@
+<header class="page">
+  <div>
+    <p>MEDICATION OPERATIONS</p>
+    <h1>Pharmacy</h1>
+    <span>Medicine catalog, pricing and real-time stock control.</span>
+  </div>
+  @if (auth.hasPermission('Pharmacy.Create')) {
+    <button (click)="modal.set('medicine')">+ Add medicine</button>
+  }
+</header>
+<section class="tools">
+  <label
+    >Search medicines<input
+      #q
+      [value]="search()"
+      (keyup.enter)="search.set(q.value); load()"
+      placeholder="Name, generic or barcode" /></label
+  ><button (click)="search.set(q.value); load()">Search</button>
+</section>
+<section class="metrics">
+  <article>
+    <small>MEDICINES</small><b>{{ medicines().length }}</b>
+  </article>
+  <article>
+    <small>LOW STOCK</small><b>{{ lowStockCount() }}</b>
+  </article>
+  <article><small>INVENTORY STATUS</small><b>Live</b></article>
+</section>
+<section class="card">
+  @if (loading()) {
+    <div class="empty">Loading pharmacy inventory...</div>
+  } @else {
+    <div class="grid">
+      @for (item of medicines(); track item.id) {
+        <article [class.low]="lowStock(item)">
+          <header>
+            <div>
+              <small>{{ item.genericName }}</small>
+              <h3>{{ item.name }} {{ item.strength }}</h3>
+              <span>{{ item.brandName || item.manufacturer || 'Generic medicine' }}</span>
+            </div>
+            <span class="badge">{{ item.dosageForm }}</span>
+          </header>
+          <div class="stock">
+            <div>
+              <small>AVAILABLE</small><b>{{ balance(item.id) }}</b>
+            </div>
+            <div>
+              <small>MINIMUM</small><b>{{ item.minimumStockLevel }}</b>
+            </div>
+            <div>
+              <small>SALE PRICE</small><b>{{ item.salePrice | number: '1.2-2' }}</b>
+            </div>
+          </div>
+          <footer>
+            @if (auth.hasPermission('Pharmacy.Dispense')) {
+              <button (click)="openStock(item)">Stock transaction</button>
+            }
+            @if (auth.hasPermission('Pharmacy.Create')) {
+              <button class="danger" (click)="remove(item)">Delete</button>
+            }
+          </footer>
+        </article>
+      } @empty {
+        <div class="empty">No medicines found.</div>
+      }
+    </div>
+  }
+</section>
+@if (modal()) {
+  <div class="backdrop">
+    <form class="modal" (ngSubmit)="modal() === 'medicine' ? saveMedicine() : saveStock()">
+      <header>
+        <h2>{{ modal() === 'medicine' ? 'Add medicine' : 'Record stock' }}</h2>
+        <button type="button" (click)="modal.set(null)">×</button>
+      </header>
+      @if (modal() === 'medicine') {
+        <div class="fields" [formGroup]="medicineForm">
+          <label>Name *<input formControlName="name" /></label
+          ><label>Generic name *<input formControlName="genericName" /></label
+          ><label>Brand<input formControlName="brandName" /></label
+          ><label>Strength *<input formControlName="strength" /></label
+          ><label
+            >Dosage form *<select formControlName="dosageForm">
+              <option value="">Select form</option>
+              <option>Tablet</option>
+              <option>Capsule</option>
+              <option>Syrup</option>
+              <option>Injection</option>
+              <option>Cream</option>
+              <option>Inhaler</option>
+            </select></label
+          ><label>Manufacturer<input formControlName="manufacturer" /></label
+          ><label>Barcode<input formControlName="barcode" /></label
+          ><label
+            >Purchase price *<input type="number" min="0" formControlName="purchasePrice" /></label
+          ><label>Sale price *<input type="number" min="0" formControlName="salePrice" /></label
+          ><label
+            >Minimum stock *<input type="number" min="0" formControlName="minimumStockLevel"
+          /></label>
+        </div>
+      } @else {
+        <div class="fields single" [formGroup]="stockForm">
+          <p>
+            <b>{{ selected()?.name }} {{ selected()?.strength }}</b
+            ><br />Current balance: {{ balance(selected()!.id) }}
+          </p>
+          <label
+            >Transaction type<select formControlName="type">
+              <option>Purchase</option>
+              <option>Sale</option>
+              <option>Adjustment</option>
+              <option>Return</option>
+            </select></label
+          ><label>Quantity<input type="number" min="1" formControlName="quantity" /></label
+          ><label
+            >Reference<input
+              formControlName="reference"
+              placeholder="Invoice, prescription or reason"
+          /></label>
+        </div>
+      }
+      <footer>
+        <button type="button" class="secondary" (click)="modal.set(null)">Cancel</button
+        ><button [disabled]="saving()">{{ saving() ? 'Saving...' : 'Save' }}</button>
+      </footer>
+    </form>
+  </div>
+}

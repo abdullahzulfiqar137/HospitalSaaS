@@ -1,0 +1,326 @@
+<header class="page-head">
+  <div>
+    <p>REVENUE CYCLE</p>
+    <h1>Billing & payments</h1>
+    <span>Invoices, collections and refunds in one workspace.</span>
+  </div>
+  @if (auth.hasPermission('Billing.Create')) {
+    <button (click)="invoiceOpen.set(true)">+ New invoice</button>
+  }
+</header>
+<nav class="tabs" aria-label="Billing sections">
+  <a routerLink="/billing" [class.active]="tab() === 'invoices'">Invoices</a>
+  <a routerLink="/payments" [class.active]="tab() === 'payments'">Payments</a>
+</nav>
+@if (loading()) {
+  <section class="state">Loading billing records…</section>
+} @else if (tab() === 'invoices') {
+  <section class="card">
+    <div class="summary">
+      <div>
+        <small>VISIBLE INVOICES</small><b>{{ invoices().length }}</b>
+      </div>
+      <div>
+        <small>PAGE TOTAL</small><b>{{ visibleInvoiceTotal() | currency }}</b>
+      </div>
+    </div>
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Invoice</th>
+            <th>Patient</th>
+            <th>Issued</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (invoice of invoices(); track invoice.id) {
+            <tr>
+              <td>
+                <b>{{ invoice.invoiceNumber }}</b>
+              </td>
+              <td>{{ patientName(invoice.patientId) }}</td>
+              <td>{{ invoice.issuedAtUtc | date: 'mediumDate' }}</td>
+              <td>
+                <span class="status">{{ invoice.status }}</span>
+              </td>
+              <td>
+                <b>{{ invoice.total | currency }}</b>
+              </td>
+              <td>
+                <button class="link" (click)="selectedInvoice.set(invoice)">Details</button>
+                @if (auth.hasPermission('Payments.Create')) {
+                  <button class="link" (click)="openPayment(invoice)">Pay</button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty">No invoices found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <footer>
+      <span>Page {{ invoicePage() }} of {{ invoicePages() }}</span>
+      <div>
+        <button [disabled]="invoicePage() === 1" (click)="changePage('invoice', invoicePage() - 1)">
+          Previous</button
+        ><button
+          [disabled]="invoicePage() === invoicePages()"
+          (click)="changePage('invoice', invoicePage() + 1)"
+        >
+          Next
+        </button>
+      </div>
+    </footer>
+  </section>
+} @else {
+  <section class="card">
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Payment</th>
+            <th>Invoice ID</th>
+            <th>Date</th>
+            <th>Method</th>
+            <th>Status</th>
+            <th>Amount</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (payment of payments(); track payment.id) {
+            <tr>
+              <td>
+                <b>{{ payment.paymentNumber }}</b>
+              </td>
+              <td>{{ payment.invoiceId }}</td>
+              <td>{{ payment.paidAtUtc | date: 'mediumDate' }}</td>
+              <td>{{ payment.method }}</td>
+              <td>
+                <span class="status">{{ payment.status }}</span>
+              </td>
+              <td>
+                <b>{{ payment.amount | currency }}</b>
+                @if (payment.refundedAmount) {
+                  <small class="refund">Refunded {{ payment.refundedAmount | currency }}</small>
+                }
+              </td>
+              <td>
+                @if (
+                  auth.hasPermission('Payments.Refund') && payment.amount > payment.refundedAmount
+                ) {
+                  <button class="link danger" (click)="openRefund(payment)">Refund</button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty">No payments found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <footer>
+      <span>Page {{ paymentPage() }} of {{ paymentPages() }}</span>
+      <div>
+        <button [disabled]="paymentPage() === 1" (click)="changePage('payment', paymentPage() - 1)">
+          Previous</button
+        ><button
+          [disabled]="paymentPage() === paymentPages()"
+          (click)="changePage('payment', paymentPage() + 1)"
+        >
+          Next
+        </button>
+      </div>
+    </footer>
+  </section>
+}
+
+@if (selectedInvoice() && !paymentOpen()) {
+  <div class="backdrop" role="presentation" (click)="selectedInvoice.set(null)">
+    <section
+      class="modal details"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="invoice-title"
+      (click)="$event.stopPropagation()"
+    >
+      <header>
+        <div>
+          <small>INVOICE DETAILS</small>
+          <h2 id="invoice-title">{{ selectedInvoice()!.invoiceNumber }}</h2>
+        </div>
+        <button aria-label="Close" (click)="selectedInvoice.set(null)">×</button>
+      </header>
+      <div class="body">
+        <p>
+          <span>Patient</span><b>{{ patientName(selectedInvoice()!.patientId) }}</b>
+        </p>
+        @for (item of selectedInvoice()!.items; track item.id) {
+          <div class="line">
+            <span
+              >{{ item.description }} · {{ item.quantity }} × {{ item.unitPrice | currency }}</span
+            ><b>{{ item.quantity * item.unitPrice - item.discount + item.tax | currency }}</b>
+          </div>
+        }
+        <div class="grand">
+          <span>Total</span><b>{{ selectedInvoice()!.total | currency }}</b>
+        </div>
+      </div>
+    </section>
+  </div>
+}
+
+@if (invoiceOpen()) {
+  <div class="backdrop" role="presentation">
+    <form
+      class="modal invoice"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="new-invoice-title"
+      [formGroup]="invoiceForm"
+      (ngSubmit)="createInvoice()"
+    >
+      <header>
+        <div>
+          <small>NEW INVOICE</small>
+          <h2 id="new-invoice-title">Create patient invoice</h2>
+        </div>
+        <button type="button" aria-label="Close" (click)="invoiceOpen.set(false)">×</button>
+      </header>
+      <div class="body">
+        <label
+          >Patient *<select formControlName="patientId">
+            <option value="">Select patient</option>
+            @for (patient of patients(); track patient.id) {
+              <option [value]="patient.id">
+                {{ formatPatientLabel(patient) }}
+              </option>
+            }
+          </select></label
+        >
+        <div class="line-head">
+          <b>Invoice items</b><button type="button" (click)="addLine()">+ Add line</button>
+        </div>
+        <div formArrayName="items">
+          @for (line of items.controls; track line; let index = $index) {
+            <div class="item" [formGroupName]="index">
+              <label>Description<input formControlName="description" /></label
+              ><label
+                >Qty<input type="number" min="0.01" step="0.01" formControlName="quantity" /></label
+              ><label
+                >Unit price<input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  formControlName="unitPrice" /></label
+              ><label
+                >Discount<input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  formControlName="discount" /></label
+              ><label>Tax<input type="number" min="0" step="0.01" formControlName="tax" /></label
+              ><button
+                type="button"
+                aria-label="Remove invoice line"
+                [disabled]="items.length === 1"
+                (click)="removeLine(index)"
+              >
+                ×
+              </button>
+            </div>
+          }
+        </div>
+        <div class="grand">
+          <span>Draft total</span><b>{{ draftTotal() | currency }}</b>
+        </div>
+      </div>
+      <footer>
+        <button type="button" class="secondary" (click)="invoiceOpen.set(false)">Cancel</button
+        ><button [disabled]="invoiceForm.invalid || saving()">
+          {{ saving() ? 'Creating…' : 'Create invoice' }}
+        </button>
+      </footer>
+    </form>
+  </div>
+}
+
+@if (paymentOpen()) {
+  <div class="backdrop" role="presentation">
+    <form
+      class="modal small"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="payment-title"
+      [formGroup]="paymentForm"
+      (ngSubmit)="recordPayment()"
+    >
+      <header>
+        <h2 id="payment-title">Record payment</h2>
+        <button type="button" aria-label="Close" (click)="paymentOpen.set(false)">×</button>
+      </header>
+      <div class="body">
+        <p class="muted">
+          {{ selectedInvoice()?.invoiceNumber }} · {{ selectedInvoice()?.total | currency }}
+        </p>
+        <label>Amount<input type="number" min="0.01" step="0.01" formControlName="amount" /></label
+        ><label
+          >Payment method<select formControlName="method">
+            <option>Card</option>
+            <option>Cash</option>
+            <option>Bank Transfer</option>
+            <option>Insurance</option>
+          </select></label
+        >
+      </div>
+      <footer>
+        <button type="button" class="secondary" (click)="paymentOpen.set(false)">Cancel</button
+        ><button [disabled]="paymentForm.invalid || saving()">Confirm payment</button>
+      </footer>
+    </form>
+  </div>
+}
+
+@if (refundOpen()) {
+  <div class="backdrop" role="presentation">
+    <form
+      class="modal small"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="refund-title"
+      [formGroup]="refundForm"
+      (ngSubmit)="refund()"
+    >
+      <header>
+        <h2 id="refund-title">Refund payment</h2>
+        <button type="button" aria-label="Close" (click)="refundOpen.set(false)">×</button>
+      </header>
+      <div class="body">
+        <p class="muted">{{ selectedPayment()?.paymentNumber }}</p>
+        <label
+          >Refund amount<input
+            type="number"
+            min="0.01"
+            step="0.01"
+            [max]="selectedPayment()!.amount - selectedPayment()!.refundedAmount"
+            formControlName="amount"
+        /></label>
+      </div>
+      <footer>
+        <button type="button" class="secondary" (click)="refundOpen.set(false)">Cancel</button
+        ><button class="danger-btn" [disabled]="refundForm.invalid || saving()">
+          Process refund
+        </button>
+      </footer>
+    </form>
+  </div>
+}

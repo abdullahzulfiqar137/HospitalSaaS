@@ -1,0 +1,85 @@
+<header class="page">
+  <div>
+    <p>PATIENT MANAGEMENT</p>
+    <h1>Patients</h1>
+    <span>Manage registrations and patient demographics.</span>
+  </div>
+  @if (auth.hasPermission('Patients.Create')) {
+    <a routerLink="new">+ Add patient</a>
+  }
+</header>
+<section class="card">
+  <div class="tools">
+    <label
+      >⌕
+      <input [formControl]="search" placeholder="Search by name, number, phone or email" /></label
+    ><button (click)="changePage(1)">Refresh</button>
+  </div>
+  @if (data$ | async; as state) {
+    @if (state.error) {
+      <div class="state">Unable to load patients. Check the API connection.</div>
+    } @else if (state.data?.items?.length) {
+      <div class="table">
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Patient ID</th>
+              <th>Gender</th>
+              <th>Date of birth</th>
+              <th>Contact</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (patient of state.data!.items; track patient.id) {
+              <tr>
+                <td>
+                  <b>{{ patient.firstName }} {{ patient.middleName }} {{ patient.lastName }}</b
+                  ><small>{{ patient.email || 'No email' }}</small>
+                </td>
+                <td>{{ patient.patientNumber }}</td>
+                <td>{{ patient.gender }}</td>
+                <td>{{ patient.dateOfBirth | date }}</td>
+                <td>{{ patient.phone || '—' }}</td>
+                <td>
+                  <span class="status">{{ patient.status }}</span>
+                </td>
+                <td>
+                  <a [routerLink]="[patient.id, 'edit']">Edit</a>
+                  @if (auth.hasPermission('Patients.Delete')) {
+                    <button class="danger" (click)="remove(patient.id)">Delete</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <footer>
+        <span>Showing {{ state.data!.items.length }} of {{ state.data!.totalCount }} patients</span>
+        <div>
+          <button [disabled]="!state.data!.hasPreviousPage" (click)="changePage(page() - 1)">
+            Previous</button
+          ><b>Page {{ state.data!.pageNumber }} of {{ state.data!.totalPages }}</b
+          ><button [disabled]="!state.data!.hasNextPage" (click)="changePage(page() + 1)">
+            Next
+          </button>
+        </div>
+      </footer>
+    } @else {
+      <div class="state">No patients found. Create the first patient to get started.</div>
+    }
+  }
+</section>
+@if (pendingDelete()) {
+  <app-confirmation-dialog
+    title="Delete patient?"
+    message="This patient record will be permanently deleted. This action cannot be undone."
+    confirmLabel="Delete patient"
+    [busy]="deleting()"
+    (cancelled)="pendingDelete.set(null)"
+    (confirmed)="confirmDelete()"
+  />
+}

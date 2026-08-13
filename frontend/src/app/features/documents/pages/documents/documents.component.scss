@@ -1,0 +1,80 @@
+header p {
+  font-size: 11px;
+  color: #087f8c;
+  font-weight: 800;
+}
+header h1 {
+  margin: 5px 0;
+}
+header span,
+small {
+  color: #718096;
+}
+.upload,
+.list {
+  background: #fff;
+  border: 1px solid #e5ebef;
+  border-radius: 14px;
+  padding: 22px;
+  margin-top: 20px;
+}
+.upload {
+  display: flex;
+  gap: 15px;
+  align-items: end;
+}
+.upload label {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+  font-size: 12px;
+  font-weight: 700;
+}
+input {
+  padding: 11px;
+  border: 1px solid #d8e1e7;
+  border-radius: 8px;
+}
+.file {
+  position: relative;
+  border: 1px dashed #a8bbc5;
+  padding: 12px;
+}
+.file input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+button {
+  border: 0;
+  background: #087f8c;
+  color: white;
+  padding: 11px 14px;
+  border-radius: 8px;
+}
+.filter {
+  display: flex;
+  gap: 10px;
+}
+.filter input {
+  flex: 1;
+}
+article {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-top: 1px solid #edf1f3;
+}
+article div {
+  display: grid;
+  flex: 1;
+}
+article button {
+  background: #fff0f0;
+  color: #c92a2a;
+}
+@media (max-width: 650px) {
+  .upload {
+    display: grid;
+  }
+}

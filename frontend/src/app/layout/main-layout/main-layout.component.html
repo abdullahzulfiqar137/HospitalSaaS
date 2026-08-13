@@ -1,0 +1,10 @@
+<div class="shell" [class.collapsed]="collapsed()">
+  <app-sidebar [collapsed]="collapsed()" (toggle)="collapsed.set(!collapsed())" />
+  <div class="body">
+    <app-navbar (menu)="collapsed.set(!collapsed())" />
+    <main><router-outlet /></main>
+  </div>
+</div>
+@if (notices.toast(); as toast) {
+  <div class="toast" [class]="toast.tone">{{ toast.message }}</div>
+}

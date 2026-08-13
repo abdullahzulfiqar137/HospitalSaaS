@@ -1,0 +1,29 @@
+# Node / Angular
+**/node_modules/
+**/dist/
+**/.angular/
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+
+# .NET / C#
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/[Dd]ebug/
+**/[Rr]elease/
+*.user
+*.userosscache
+*.sln.docstates
+
+# IDE & OS Files
+.DS_Store
+Thumbs.db
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Local Environment Overrides
+**/appsettings.Development.json

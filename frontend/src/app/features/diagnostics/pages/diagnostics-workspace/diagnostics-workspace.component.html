@@ -1,0 +1,328 @@
+<header class="page">
+  <div>
+    <p>DIAGNOSTIC OPERATIONS</p>
+    <h1>{{ mode() === 'laboratory' ? 'Laboratory' : 'Radiology' }}</h1>
+    <span>Manage diagnostic orders, clinical results, and the test catalog.</span>
+  </div>
+  @if (
+    auth.hasPermission(mode() === 'laboratory' ? 'Laboratory.CreateOrder' : 'Radiology.CreateOrder')
+  ) {
+    <button (click)="panel() === 'orders' ? openOrder() : modal.set('test')">
+      + {{ panel() === 'orders' ? 'New order' : 'Add test' }}
+    </button>
+  }
+</header>
+<nav class="tabs">
+  <button [class.active]="panel() === 'orders'" (click)="panel.set('orders')">Orders</button>
+  <button [class.active]="panel() === 'catalog'" (click)="panel.set('catalog')">
+    Test catalog
+  </button>
+</nav>
+
+<section class="metrics">
+  <article>
+    <small>TOTAL ORDERS</small
+    ><b>{{ mode() === 'laboratory' ? labOrders().length : radiologyOrders().length }}</b>
+  </article>
+  <article>
+    <small>ACTIVE TESTS</small
+    ><b>{{ mode() === 'laboratory' ? labTests().length : radiologyTests().length }}</b>
+  </article>
+  <article>
+    <small>COMPLETED</small
+    ><b>{{ mode() === 'laboratory' ? labOrders().length : radiologyOrders().length }}</b
+    ><span>Live workspace</span>
+  </article>
+</section>
+
+<section class="card">
+  @if (loading()) {
+    <div class="empty">Loading diagnostic workspace...</div>
+  } @else if (panel() === 'catalog') {
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Test</th>
+            <th>Category / Modality</th>
+            <th>Reference</th>
+            <th>Price</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (mode() === 'laboratory') {
+            @for (test of labTests(); track test.id) {
+              <tr>
+                <td>
+                  <b>{{ test.code }}</b>
+                </td>
+                <td>{{ test.name }}</td>
+                <td>{{ test.category }}</td>
+                <td>
+                  {{ test.normalRange || '—' }} <small>{{ test.unit }}</small>
+                </td>
+                <td>{{ test.price | number: '1.2-2' }}</td>
+                <td>
+                  <span class="status done">{{ test.isActive ? 'Active' : 'Inactive' }}</span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty">No laboratory tests configured.</td>
+              </tr>
+            }
+          } @else {
+            @for (test of radiologyTests(); track test.id) {
+              <tr>
+                <td>
+                  <b>{{ test.code }}</b>
+                </td>
+                <td>{{ test.name }}</td>
+                <td>{{ test.modality }}</td>
+                <td>Imaging procedure</td>
+                <td>{{ test.price | number: '1.2-2' }}</td>
+                <td>
+                  <span class="status done">{{ test.isActive ? 'Active' : 'Inactive' }}</span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty">No radiology tests configured.</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else if (mode() === 'laboratory') {
+    <div class="order-grid">
+      @for (order of labOrders(); track order.id) {
+        <article class="order">
+          <header>
+            <div>
+              <small>{{ order.orderedAtUtc | date: 'medium' }}</small>
+              <h3>{{ patientName(order.patientId) }}</h3>
+              <span>{{ doctorName(order.doctorId) }}</span>
+            </div>
+            <span
+              class="status"
+              [class.done]="order.status === 'Completed'"
+              [class.cancelled]="order.status === 'Cancelled'"
+              >{{ order.status }}</span
+            >
+          </header>
+          <div class="items">
+            @for (item of order.items; track item.id) {
+              <div>
+                <span
+                  ><b>{{ item.testCode }}</b> {{ item.testName }}</span
+                ><span>{{ item.result || 'Pending' }} {{ item.unit || '' }}</span>
+                @if (
+                  auth.hasPermission('Laboratory.RecordResult') && order.status === 'Processing'
+                ) {
+                  <button class="link" (click)="openResult(order, item.id)">
+                    {{ item.result ? 'Update' : 'Record result' }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+          @if (auth.hasPermission('Laboratory.RecordResult')) {
+            <footer>
+              @if (order.status === 'Ordered') {
+                <button (click)="labAction(order, 'CollectSample')">Collect sample</button>
+              }
+              @if (order.status === 'SampleCollected') {
+                <button (click)="labAction(order, 'StartProcessing')">Start processing</button>
+              }
+              @if (order.status !== 'Completed' && order.status !== 'Cancelled') {
+                <button class="danger-link" (click)="labAction(order, 'Cancel')">Cancel</button>
+              }
+            </footer>
+          }
+        </article>
+      } @empty {
+        <div class="empty">No laboratory orders found.</div>
+      }
+    </div>
+  } @else {
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Ordered</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Procedure</th>
+            <th>Status</th>
+            <th>Report</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of radiologyOrders(); track order.id) {
+            <tr>
+              <td>
+                {{ order.orderedAtUtc | date: 'mediumDate'
+                }}<small>{{ order.orderedAtUtc | date: 'shortTime' }}</small>
+              </td>
+              <td>
+                <b>{{ patientName(order.patientId) }}</b>
+              </td>
+              <td>{{ doctorName(order.doctorId) }}</td>
+              <td>{{ order.procedure }}</td>
+              <td>
+                <span class="status" [class.done]="order.status === 'Completed'">{{
+                  order.status
+                }}</span>
+              </td>
+              <td class="report">{{ order.report || 'Awaiting report' }}</td>
+              <td>
+                @if (auth.hasPermission('Radiology.RecordResult')) {
+                  <button class="link" (click)="openReport(order)">
+                    {{ order.report ? 'Revise report' : 'Record report' }}
+                  </button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty">No radiology orders found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
+
+@if (modal()) {
+  <div class="backdrop">
+    <form
+      class="modal"
+      (ngSubmit)="
+        modal() === 'order'
+          ? saveOrder()
+          : modal() === 'test'
+            ? saveTest()
+            : modal() === 'result'
+              ? saveResult()
+              : saveReport()
+      "
+    >
+      <header>
+        <div>
+          <small>DIAGNOSTIC WORKFLOW</small>
+          <h2>
+            {{
+              modal() === 'order'
+                ? 'Create new order'
+                : modal() === 'test'
+                  ? 'Add catalog test'
+                  : modal() === 'result'
+                    ? 'Record lab result'
+                    : 'Radiology report'
+            }}
+          </h2>
+        </div>
+        <button type="button" aria-label="Close" (click)="modal.set(null)">×</button>
+      </header>
+      @if (modal() === 'order') {
+        <div class="fields" [formGroup]="orderForm">
+          <label
+            >Patient *<select formControlName="patientId">
+              <option value="">Select patient</option>
+              @for (patient of patients(); track patient.id) {
+                <option [value]="patient.id">
+                  {{ formatPatientLabel(patient) }}
+                </option>
+              }
+            </select></label
+          ><label
+            >Ordering doctor *<select formControlName="doctorId">
+              <option value="">Select doctor</option>
+              @for (doctor of doctors(); track doctor.id) {
+                <option [value]="doctor.id">
+                  Dr. {{ doctor.firstName }} {{ doctor.lastName }}
+                </option>
+              }
+            </select></label
+          >
+          <label class="wide"
+            >{{ mode() === 'laboratory' ? 'Add test' : 'Procedure *'
+            }}<select formControlName="testId" (change)="mode() === 'laboratory' && addLabTest()">
+              <option value="">Select test</option>
+              @for (
+                test of mode() === 'laboratory' ? labTests() : radiologyTests();
+                track test.id
+              ) {
+                <option [value]="test.id">{{ test.code }} — {{ test.name }}</option>
+              }
+            </select></label
+          >
+          @if (mode() === 'laboratory') {
+            <div class="chips wide">
+              @for (test of selectedLabTests(); track test.id) {
+                <button type="button" (click)="removeLabTest(test.id)">{{ test.name }} ×</button>
+              } @empty {
+                <p>Select one or more tests for this order.</p>
+              }
+            </div>
+          }
+        </div>
+      } @else if (modal() === 'test') {
+        <div class="fields" [formGroup]="testForm">
+          <label>Code *<input formControlName="code" /></label
+          ><label>Name *<input formControlName="name" /></label>
+          @if (mode() === 'laboratory') {
+            <label>Category *<input formControlName="category" /></label
+            ><label>Normal range<input formControlName="normalRange" /></label
+            ><label>Unit<input formControlName="unit" /></label>
+          } @else {
+            <label
+              >Modality *<select formControlName="modality">
+                <option value="">Select modality</option>
+                <option>X-Ray</option>
+                <option>CT</option>
+                <option>MRI</option>
+                <option>Ultrasound</option>
+                <option>Mammography</option>
+              </select></label
+            >
+          }
+          <label>Price *<input type="number" min="0" formControlName="price" /></label>
+        </div>
+      } @else if (modal() === 'result') {
+        <div class="fields single" [formGroup]="resultForm">
+          <label>Result *<input formControlName="result" /></label
+          ><label>Unit<input formControlName="unit" /></label
+          ><label>Reference range<input formControlName="referenceRange" /></label>
+        </div>
+      } @else {
+        <div class="fields single" [formGroup]="reportForm">
+          <label
+            >Clinical findings and impression *<textarea
+              rows="10"
+              formControlName="report"
+              placeholder="Document findings, impression, and recommendations..."
+            ></textarea>
+          </label>
+        </div>
+      }
+      <footer>
+        <button type="button" class="secondary" (click)="modal.set(null)">Cancel</button
+        ><button
+          [disabled]="
+            saving() ||
+            (modal() === 'order' &&
+              (orderForm.invalid || (mode() === 'laboratory' && !selectedLabTests().length)))
+          "
+        >
+          {{ saving() ? 'Saving...' : 'Save' }}
+        </button>
+      </footer>
+    </form>
+  </div>
+}

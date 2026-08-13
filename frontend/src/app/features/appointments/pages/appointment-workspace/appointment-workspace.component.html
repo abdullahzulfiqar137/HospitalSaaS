@@ -1,0 +1,222 @@
+<header class="page">
+  <div>
+    <p>CARE SCHEDULING</p>
+    <h1>Appointments</h1>
+    <span>Book visits and manage the complete patient journey.</span>
+  </div>
+  @if (auth.hasPermission('Appointments.Create')) {
+    <button (click)="createOpen.set(true)">+ Book appointment</button>
+  }
+</header>
+<section class="filters">
+  <label
+    >Date<input
+      type="date"
+      #date
+      [value]="dateFilter()"
+      (change)="dateFilter.set(date.value); load()" /></label
+  ><label
+    >Status<select
+      #status
+      [value]="statusFilter()"
+      (change)="statusFilter.set($any(status.value)); load()"
+    >
+      <option value="">All statuses</option>
+      <option>Scheduled</option>
+      <option>Confirmed</option>
+      <option>CheckedIn</option>
+      <option>InProgress</option>
+      <option>Completed</option>
+      <option>Cancelled</option>
+      <option>NoShow</option>
+    </select></label
+  ><button (click)="dateFilter.set(''); statusFilter.set(''); load()">Clear filters</button>
+</section>
+<section class="card">
+  @if (loading()) {
+    <div class="empty">Loading appointments…</div>
+  } @else {
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Date & time</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Department</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (appointment of visible(); track appointment.id) {
+            <tr>
+              <td>
+                <b>{{ appointment.appointmentDateTimeUtc | date: 'mediumDate' }}</b
+                ><small
+                  >{{ appointment.appointmentDateTimeUtc | date: 'shortTime' }} ·
+                  {{ appointment.durationMinutes }} min</small
+                >
+              </td>
+              <td>
+                {{ patientName(appointment.patientId) }}<small>{{ appointment.reason }}</small>
+              </td>
+              <td>{{ doctorName(appointment.doctorId) }}</td>
+              <td>{{ departmentName(appointment.departmentId) }}</td>
+              <td>{{ appointment.appointmentType }}</td>
+              <td>
+                <span
+                  class="status"
+                  [class.done]="appointment.status === 'Completed'"
+                  [class.cancelled]="
+                    appointment.status === 'Cancelled' || appointment.status === 'NoShow'
+                  "
+                  >{{ appointment.status }}</span
+                >
+              </td>
+              <td>
+                @if (auth.hasPermission('Appointments.Update')) {
+                  @for (action of actions(appointment.status); track action) {
+                    <button
+                      class="link"
+                      [class.danger]="action === 'Cancel'"
+                      (click)="openAction(appointment, action)"
+                    >
+                      {{ action }}
+                    </button>
+                  }
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty">No appointments found for these filters.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
+@if (createOpen()) {
+  <div class="backdrop">
+    <form
+      class="modal"
+      [formGroup]="form"
+      (ngSubmit)="book()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="book-title"
+    >
+      <header>
+        <div>
+          <small>NEW APPOINTMENT</small>
+          <h2 id="book-title">Book patient visit</h2>
+        </div>
+        <button type="button" aria-label="Close" (click)="createOpen.set(false)">×</button>
+      </header>
+      <div class="fields">
+        <label
+          >Patient *<select formControlName="patientId">
+            <option value="">Select patient</option>
+            @for (patient of patients(); track patient.id) {
+              <option [value]="patient.id">
+                {{ formatPatientLabel(patient) }}
+              </option>
+            }
+          </select></label
+        ><label
+          >Doctor *<select formControlName="doctorId">
+            <option value="">Select doctor</option>
+            @for (doctor of doctors(); track doctor.id) {
+              <option [value]="doctor.id">
+                {{ formatDoctorLabel(doctor) }}
+              </option>
+            }
+          </select></label
+        ><label
+          >Department *<select formControlName="departmentId">
+            <option value="">Select department</option>
+            @for (department of allAvailableDepartments(); track department.id) {
+              <option [value]="department.id">{{ department.name }}</option>
+            }
+          </select></label
+        ><label
+          >Date and time *<input
+            type="datetime-local"
+            formControlName="appointmentDateTimeUtc" /></label
+        ><label
+          >Duration *<select formControlName="durationMinutes">
+            <option [value]="15">15 minutes</option>
+            <option [value]="30">30 minutes</option>
+            <option [value]="45">45 minutes</option>
+            <option [value]="60">60 minutes</option>
+          </select></label
+        ><label
+          >Appointment type *<select formControlName="appointmentType">
+            <option>Consultation</option>
+            <option>Follow-up</option>
+            <option>Procedure</option>
+            <option>Emergency</option>
+            <option>Telemedicine</option>
+          </select></label
+        ><label class="wide">Reason *<input formControlName="reason" /></label
+        ><label class="wide">Notes<textarea rows="3" formControlName="notes"></textarea></label>
+      </div>
+      <footer>
+        <button type="button" class="secondary" (click)="createOpen.set(false)">Cancel</button
+        ><button [disabled]="saving() || form.invalid">
+          {{ saving() ? 'Booking…' : 'Book appointment' }}
+        </button>
+      </footer>
+    </form>
+  </div>
+}
+@if (actionOpen()) {
+  <div class="backdrop">
+    <form
+      class="modal small"
+      [formGroup]="actionForm"
+      (ngSubmit)="runAction()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="action-title"
+    >
+      <header>
+        <div>
+          <small>APPOINTMENT ACTION</small>
+          <h2 id="action-title">{{ actionName() }} appointment</h2>
+        </div>
+        <button type="button" aria-label="Close" (click)="actionOpen.set(false)">×</button>
+      </header>
+      <div class="fields single">
+        <p>
+          <b>{{ patientName(selected()!.patientId) }}</b
+          ><br />{{ selected()!.appointmentDateTimeUtc | date: 'medium' }}
+        </p>
+        @if (actionName() === 'Cancel') {
+          <label
+            >Cancellation reason *<textarea rows="3" formControlName="reason"></textarea>
+          </label>
+        } @else if (actionName() === 'Reschedule') {
+          <label
+            >New date and time *<input
+              type="datetime-local"
+              formControlName="appointmentDateTimeUtc" /></label
+          ><label
+            >Duration *<input type="number" min="5" formControlName="durationMinutes"
+          /></label>
+        } @else {
+          <p class="muted">Confirm this workflow action for the selected appointment.</p>
+        }
+      </div>
+      <footer>
+        <button type="button" class="secondary" (click)="actionOpen.set(false)">Back</button
+        ><button [class.danger-btn]="actionName() === 'Cancel'" [disabled]="saving()">
+          Confirm {{ actionName().toLowerCase() }}
+        </button>
+      </footer>
+    </form>
+  </div>
+}

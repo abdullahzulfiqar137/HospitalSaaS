@@ -1,0 +1,180 @@
+<header class="page">
+  <div>
+    <p>ACCESS GOVERNANCE & SECURITY</p>
+    <h1>{{ mode() === 'users' ? 'Users & System Access' : 'Roles & Permission Policies' }}</h1>
+    <span>{{
+      mode() === 'users'
+        ? 'Manage tenant user accounts and assigned hospital roles.'
+        : 'Define least-privilege access rules across clinical & administrative modules.'
+    }}</span>
+  </div>
+  @if (auth.hasPermission(mode() === 'users' ? 'Users.Create' : 'Roles.Create')) {
+    <button class="primary-btn" (click)="openModal()">+ Create {{ mode() === 'users' ? 'user' : 'role' }}</button>
+  }
+</header>
+
+<section class="metrics">
+  <article>
+    <small>REGISTERED USERS</small><b>{{ users().length }}</b>
+  </article>
+  <article>
+    <small>ACTIVE ROLES</small><b>{{ roles().length }}</b>
+  </article>
+  <article><small>SECURITY</small><b>JWT</b><span>Tenant scoped</span></article>
+</section>
+
+<section class="card">
+  @if (loading()) {
+    <div class="empty">Loading access control policies...</div>
+  } @else if (mode() === 'users') {
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Assigned roles</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user.id) {
+            <tr>
+              <td>
+                <b>{{ user.email }}</b>
+              </td>
+              <td>
+                <div class="chips">
+                  @for (role of user.roles; track role) {
+                    <span class="role-pill">{{ role }}</span>
+                  }
+                </div>
+              </td>
+              <td>
+                <span class="status" [class.active]="user.isActive">{{
+                  user.isActive ? 'Active' : 'Inactive'
+                }}</span>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="3" class="empty">No users found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="role-grid">
+      @for (role of roles(); track role.id) {
+        <article class="role-card">
+          <div class="role-card-header">
+            <h3>{{ role.name }}</h3>
+            <span class="perm-count-badge">{{ role.permissions.length }} permissions</span>
+          </div>
+          <div class="chips">
+            @for (permission of role.permissions; track permission) {
+              <span class="perm-chip">{{ permission }}</span>
+            }
+          </div>
+        </article>
+      } @empty {
+        <div class="empty">No roles found.</div>
+      }
+    </div>
+  }
+</section>
+
+@if (modal()) {
+  <div class="backdrop">
+    <form class="modal" (ngSubmit)="save()">
+      <header>
+        <div>
+          <small>GOVERNANCE</small>
+          <h2>Create {{ mode() === 'users' ? 'User Account' : 'Hospital Role Policy' }}</h2>
+        </div>
+        <button type="button" class="close-btn" (click)="modal.set(false)">×</button>
+      </header>
+
+      @if (mode() === 'users') {
+        <div class="fields" [formGroup]="userForm">
+          <label>Email *<input type="email" formControlName="email" placeholder="user@hospital.com" /></label>
+          <label>Password *<input type="password" formControlName="password" placeholder="••••••••" /></label>
+          <fieldset class="roles-fieldset">
+            <legend>Assign Hospital Roles *</legend>
+            <div class="roles-grid">
+              @for (role of roles(); track role.id) {
+                <label class="check-card">
+                  <input
+                    type="checkbox"
+                    (change)="toggleRole(role.id, $any($event.target).checked)"
+                  />
+                  <span>{{ role.name }}</span>
+                </label>
+              }
+            </div>
+          </fieldset>
+        </div>
+      } @else {
+        <div class="fields" [formGroup]="roleForm">
+          <label class="wide-label">
+            Role Name *
+            <input formControlName="name" placeholder="e.g. Senior Consultant, Ward Nurse, Billing Clerk" />
+          </label>
+
+          <!-- Quick Preset Roles Selector -->
+          <div class="presets-section">
+            <span class="preset-title">⚡ Quick Hospital Role Presets:</span>
+            <div class="preset-buttons">
+              <button type="button" class="preset-btn" (click)="applyPresetRole('admin')">👑 Admin</button>
+              <button type="button" class="preset-btn" (click)="applyPresetRole('doctor')">🩺 Doctor</button>
+              <button type="button" class="preset-btn" (click)="applyPresetRole('nurse')">🛌 Nurse</button>
+              <button type="button" class="preset-btn" (click)="applyPresetRole('lab')">🧪 Lab Tech</button>
+              <button type="button" class="preset-btn" (click)="applyPresetRole('pharmacist')">💊 Pharmacist</button>
+              <button type="button" class="preset-btn" (click)="applyPresetRole('billing')">💳 Billing</button>
+              <button type="button" class="preset-btn" (click)="applyPresetRole('receptionist')">💼 Receptionist</button>
+            </div>
+          </div>
+
+          <!-- Categorized Permissions Selector -->
+          <div class="permissions-matrix-container">
+            <div class="matrix-header">
+              <b>Select Permissions Matrix</b>
+              <span class="selected-counter">{{ selectedPermissions().length }} permissions selected</span>
+            </div>
+
+            <div class="categories-list">
+              @for (cat of categories; track cat.name) {
+                <div class="category-block">
+                  <div class="category-header">
+                    <span class="cat-title">{{ cat.icon }} {{ cat.name }}</span>
+                    <button type="button" class="select-all-btn" (click)="toggleCategory(cat)">
+                      Toggle Category
+                    </button>
+                  </div>
+                  <div class="permissions-grid">
+                    @for (perm of cat.permissions; track perm.key) {
+                      <label class="perm-check-item" [class.checked]="selectedPermissions().includes(perm.key)">
+                        <input
+                          type="checkbox"
+                          [checked]="selectedPermissions().includes(perm.key)"
+                          (change)="togglePermission(perm.key, $any($event.target).checked)"
+                        />
+                        <span class="perm-label">{{ perm.label }}</span>
+                        <code class="perm-key">{{ perm.key }}</code>
+                      </label>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <footer>
+        <button type="button" class="secondary" (click)="modal.set(false)">Cancel</button>
+        <button type="submit" [disabled]="saving()">{{ saving() ? 'Saving...' : 'Create' }}</button>
+      </footer>
+    </form>
+  </div>
+}

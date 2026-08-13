@@ -1,0 +1,201 @@
+<section class="welcome">
+  <div>
+    <p class="eyebrow">OPERATIONS COMMAND CENTER</p>
+    <h1>Hospital Overview</h1>
+    <span>{{ today | date: 'EEEE, MMMM d, y' }} · Live clinical & administrative summary</span>
+  </div>
+  <div class="welcome-actions">
+    @if (auth.hasPermission('Patients.Create')) {
+      <a class="primary-btn" routerLink="/patients/new">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Register Patient</span>
+      </a>
+    }
+  </div>
+</section>
+
+@if (summary$ | async; as s) {
+  <section class="stats" aria-label="Hospital statistics">
+    <article class="stat teal">
+      <div class="stat-header">
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+          </svg>
+        </div>
+        <span class="trend positive">+14% this month</span>
+      </div>
+      <div class="stat-body">
+        <span>Total Patients</span>
+        <strong>{{ s.patients }}</strong>
+        <small>Registered patient records</small>
+      </div>
+    </article>
+
+    <article class="stat blue">
+      <div class="stat-header">
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+          </svg>
+        </div>
+        <span class="trend neutral">Scheduled</span>
+      </div>
+      <div class="stat-body">
+        <span>Appointments Today</span>
+        <strong>{{ s.appointmentsToday }}</strong>
+        <small>Across {{ s.doctors }} active doctors</small>
+      </div>
+    </article>
+
+    <article class="stat violet">
+      <div class="stat-header">
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 4v16"/>
+            <path d="M2 8h18a2 2 0 0 1 2 2v10"/>
+          </svg>
+        </div>
+        <span class="trend positive">85% Occupancy</span>
+      </div>
+      <div class="stat-body">
+        <span>Active Admissions</span>
+        <strong>{{ s.activeAdmissions }}</strong>
+        <small>Current inpatient census</small>
+      </div>
+    </article>
+
+    <article class="stat amber">
+      <div class="stat-header">
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+            <line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
+        </div>
+        <span class="trend warning">Pending Action</span>
+      </div>
+      <div class="stat-body">
+        <span>Unpaid Invoices</span>
+        <strong>{{ s.unpaidInvoices }}</strong>
+        <small>Require billing follow-up</small>
+      </div>
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <article class="panel attention">
+      <header>
+        <div>
+          <p class="eyebrow">ATTENTION REQUIRED</p>
+          <h2>Operational Priorities</h2>
+        </div>
+        <span class="live-pill">
+          <span class="pulse-dot"></span> Live
+        </span>
+      </header>
+
+      <div class="priority-list">
+        <a routerLink="/laboratory" class="priority-item">
+          <div class="priority-icon lab">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+              <path d="M12 18v-6"/>
+            </svg>
+          </div>
+          <div class="priority-details">
+            <b>Pending Laboratory Orders</b>
+            <small>Test results & lab processing queue</small>
+          </div>
+          <div class="priority-count count-amber">{{ s.pendingLabOrders }}</div>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+
+        <a routerLink="/inventory" class="priority-item">
+          <div class="priority-icon stock">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+          </div>
+          <div class="priority-details">
+            <b>Low-Stock Medicines</b>
+            <small>Pharmacy items below minimum threshold</small>
+          </div>
+          <div class="priority-count count-red">{{ s.lowStockMedicines }}</div>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+
+        <a routerLink="/notifications" class="priority-item">
+          <div class="priority-icon notice">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            </svg>
+          </div>
+          <div class="priority-details">
+            <b>Pending Notifications</b>
+            <small>Dispatch messages awaiting delivery</small>
+          </div>
+          <div class="priority-count count-blue">{{ s.pendingNotifications }}</div>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="panel shortcuts">
+      <header>
+        <div>
+          <p class="eyebrow">QUICK ACCESS</p>
+          <h2>Clinical Workflows</h2>
+        </div>
+      </header>
+
+      <div class="shortcut-grid">
+        <a routerLink="/appointments" class="shortcut-card">
+          <div class="shortcut-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+          </div>
+          <b>Appointments</b>
+          <small>Manage daily schedule</small>
+        </a>
+
+        <a routerLink="/admissions" class="shortcut-card">
+          <div class="shortcut-icon teal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/></svg>
+          </div>
+          <b>Admissions</b>
+          <small>Inpatient bed census</small>
+        </a>
+
+        <a routerLink="/billing" class="shortcut-card">
+          <div class="shortcut-icon violet">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <b>Billing</b>
+          <small>Invoices & ledgers</small>
+        </a>
+
+        <a routerLink="/pharmacy" class="shortcut-card">
+          <div class="shortcut-icon amber">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12"/><path d="M8 3v4l-4.5 9A4 4 0 0 0 7 21h10a4 4 0 0 0 3.5-5L16 7V3"/></svg>
+          </div>
+          <b>Pharmacy</b>
+          <small>Stock & Rx dispensing</small>
+        </a>
+      </div>
+    </article>
+  </section>
+} @else {
+  <section class="unavailable">
+    <div>!</div>
+    <h2>Dashboard data is unavailable</h2>
+    <p>Start the Hospital SaaS API on port 7185, then refresh this page.</p>
+    <button (click)="reload()">Try again</button>
+  </section>
+}
+

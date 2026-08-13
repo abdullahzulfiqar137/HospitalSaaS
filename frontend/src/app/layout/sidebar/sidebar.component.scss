@@ -1,0 +1,236 @@
+:host {
+  background:
+    radial-gradient(circle at 15% 5%, rgba(17, 113, 132, 0.35), transparent 30%),
+    linear-gradient(180deg, #05232e 0%, #073544 100%);
+  color: #d5e8eb;
+  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
+  z-index: 11;
+}
+
+aside {
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+header {
+  height: 72px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  .mark {
+    background: linear-gradient(135deg, #2ec4b6 0%, #087f8c 100%);
+    color: #ffffff;
+    border-radius: 12px;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 6px 18px rgba(46, 196, 182, 0.3);
+  }
+
+  .brand-title-wrap {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .brand-text {
+      font-weight: 800;
+      white-space: nowrap;
+      font-size: 16px;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+
+      span {
+        color: #2ec4b6;
+      }
+    }
+
+    .brand-subtitle {
+      font-size: 7.5px;
+      font-weight: 800;
+      color: #2ec4b6;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      opacity: 0.9;
+    }
+  }
+
+  button {
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+    }
+  }
+}
+
+nav {
+  padding: 16px 12px 24px;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(46, 196, 182, 0.3) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(46, 196, 182, 0.3);
+    border-radius: 10px;
+  }
+
+  section {
+    margin-bottom: 18px;
+
+    small {
+      display: block;
+      padding: 6px 12px 8px;
+      color: #64748b;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+  }
+}
+
+a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #94a3b8;
+  text-decoration: none;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  margin: 3px 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  position: relative;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(2px);
+
+    .nav-icon {
+      color: #2ec4b6;
+      background: rgba(46, 196, 182, 0.15);
+    }
+  }
+
+  &.active {
+    color: #ffffff;
+    background: linear-gradient(90deg, rgba(46, 196, 182, 0.2), rgba(46, 196, 182, 0.05));
+    border: 1px solid rgba(46, 196, 182, 0.25);
+    font-weight: 700;
+
+    .nav-icon {
+      color: #2ec4b6;
+      background: rgba(46, 196, 182, 0.25);
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -1px;
+      top: 8px;
+      bottom: 8px;
+      width: 3.5px;
+      border-radius: 4px;
+      background: #2ec4b6;
+      box-shadow: 0 0 10px #2ec4b6;
+    }
+  }
+}
+
+.nav-icon {
+  font-style: normal;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  color: #94a3b8;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+
+  svg {
+    stroke-width: 2;
+  }
+}
+
+footer {
+  margin: 12px 14px 16px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .workspace-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    color: #2ec4b6;
+    letter-spacing: 0.8px;
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #2ec4b6;
+      box-shadow: 0 0 8px #2ec4b6;
+      animation: pulse 2s infinite;
+    }
+  }
+
+  b {
+    font-size: 13px;
+    color: #ffffff;
+  }
+
+  small {
+    color: #64748b;
+    font-size: 11px;
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+@media (max-width: 800px) {
+  :host {
+    display: none;
+  }
+}
+

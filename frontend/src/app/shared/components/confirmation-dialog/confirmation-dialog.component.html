@@ -1,0 +1,19 @@
+<div class="backdrop" role="presentation" (click)="cancelled.emit()">
+  <section
+    class="dialog"
+    role="alertdialog"
+    aria-modal="true"
+    [attr.aria-label]="title()"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="icon">!</div>
+    <h2>{{ title() }}</h2>
+    <p>{{ message() }}</p>
+    <footer>
+      <button class="cancel" type="button" (click)="cancelled.emit()">Cancel</button
+      ><button class="confirm" type="button" [disabled]="busy()" (click)="confirmed.emit()">
+        {{ busy() ? 'Working…' : confirmLabel() }}
+      </button>
+    </footer>
+  </section>
+</div>

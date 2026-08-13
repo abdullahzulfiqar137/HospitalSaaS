@@ -1,0 +1,608 @@
+<main class="login">
+  <!-- Brand / Showcase Panel -->
+  <section class="brand">
+    <div class="brand-bg-glow"></div>
+    <div class="brand-content">
+      <div class="brand-header">
+        <div class="mark">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 6v12M6 12h12" />
+          </svg>
+        </div>
+        <div class="brand-title">
+          <span class="name">Hospital SaaS</span>
+          <span class="badge">Enterprise v2.4</span>
+        </div>
+      </div>
+
+      <div class="hero-text">
+        <span class="hero-tag">ROLE-BASED HEALTHCARE PORTAL</span>
+        <h1>Care operations,<br /><span class="gradient-text">beautifully connected.</span></h1>
+        <p class="hero-desc">
+          Role-isolated portals for Doctors, Hospital Admins, Suppliers, Buyers, Lab Technicians, Pharmacists, and Patients.
+        </p>
+      </div>
+
+      <!-- Feature Highlight Cards -->
+      <div class="feature-cards">
+        <div class="feature-card">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Role-Based Access Control (RBAC)</h4>
+            <p>Strict data isolation & permission-guarded routes</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="card-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Real-Time Sync</h4>
+            <p>Instant collaboration across clinical & supply teams</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust Stats Bar -->
+      <div class="trust-bar">
+        <div class="stat-item">
+          <span class="stat-value">7 Roles</span>
+          <span class="stat-label">Isolated Portals</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">250+</span>
+          <span class="stat-label">Hospitals</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">99.99%</span>
+          <span class="stat-label">RBAC Security</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Form Panel -->
+  <section class="panel">
+    <div class="form-container">
+
+      <!-- STEP 1: MANDATORY ROLE SELECTION GRID -->
+      @if (!selectedRole()) {
+        <div class="role-selection-step">
+          <div class="step-header">
+            <span class="step-badge">STEP 1 OF 2</span>
+            <h2>Select Your Portal Role</h2>
+            <p class="muted">Choose your designation to access your specialized workspace form</p>
+          </div>
+
+          <div class="role-grid">
+            @for (role of roles; track role.id) {
+              <button type="button" class="role-card" (click)="selectRole(role.id)">
+                <div class="role-card-header">
+                  <div class="role-emoji-box">{{ role.icon }}</div>
+                  <span class="role-badge-pill">{{ role.badge }}</span>
+                </div>
+                <div class="role-card-body">
+                  <h4>{{ role.title }}</h4>
+                  <p>{{ role.desc }}</p>
+                </div>
+                <div class="role-card-footer">
+                  <span>Open Portal</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <polyline points="12 5 19 12 12 19"/>
+                  </svg>
+                </div>
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- STEP 2: ROLE-SPECIFIC LOGIN OR SIGNUP FORM -->
+      @else {
+        <!-- Role Header Bar with Back Button -->
+        <div class="role-active-bar">
+          <button type="button" class="back-role-btn" (click)="resetRoleSelection()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Change Role
+          </button>
+
+          <div class="active-role-info">
+            <span class="active-emoji">{{ currentRoleInfo()?.icon }}</span>
+            <span class="active-title">{{ currentRoleInfo()?.title }} Portal</span>
+          </div>
+        </div>
+
+        <!-- Mode Switcher Tabs (Only shown for login & signup) -->
+        @if (mode() !== 'forgot') {
+          <div class="auth-tabs">
+            <button
+              type="button"
+              class="tab-btn"
+              [class.active]="mode() === 'login'"
+              (click)="switchMode('login')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                <polyline points="10 17 15 12 10 7"/>
+                <line x1="15" y1="12" x2="3" y2="12"/>
+              </svg>
+              Sign In
+            </button>
+
+            <button
+              type="button"
+              class="tab-btn"
+              [class.active]="mode() === 'signup'"
+              (click)="switchMode('signup')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="8.5" cy="7" r="4"/>
+                <line x1="20" y1="8" x2="20" y2="14"/>
+                <line x1="23" y1="11" x2="17" y2="11"/>
+              </svg>
+              Create Account
+            </button>
+          </div>
+        }
+
+        <!-- SIGN IN VIEW -->
+        @if (mode() === 'login') {
+          <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+            <div class="form-header">
+              <h2>{{ currentRoleInfo()?.title }} Login</h2>
+              <p class="muted">Access your {{ currentRoleInfo()?.title }} console & permissions</p>
+            </div>
+
+            @if (successMessage()) {
+              <div class="alert alert-success">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <span>{{ successMessage() }}</span>
+              </div>
+            }
+
+            <div class="input-field">
+              <label for="email">Work Email</label>
+              <div class="input-wrapper">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <input
+                  id="email"
+                  formControlName="email"
+                  type="email"
+                  placeholder="you@hospital.com" />
+              </div>
+            </div>
+
+            <div class="input-field">
+              <div class="label-row">
+                <label for="password">Password</label>
+                <button type="button" class="link-btn text-sm" (click)="switchMode('forgot')">
+                  Forgot password?
+                </button>
+              </div>
+              <div class="input-wrapper">
+                <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input
+                  id="password"
+                  formControlName="password"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  placeholder="Enter your password" />
+                <button type="button" class="eye-toggle" (click)="toggleShowPassword()" aria-label="Toggle password visibility">
+                  @if (showPassword()) {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  } @else {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  }
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="submit-btn" [disabled]="saving() || form.invalid">
+              @if (saving()) {
+                <span class="spinner"></span> Signing in…
+              } @else {
+                <span>Sign In to {{ currentRoleInfo()?.title }} Console</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
+              }
+            </button>
+
+            <div class="form-footer">
+              <span>Need a {{ currentRoleInfo()?.title }} account?</span>
+              <button type="button" class="link-btn bold" (click)="switchMode('signup')">Sign Up</button>
+            </div>
+          </form>
+        }
+
+        <!-- SIGN UP VIEW (ROLE-SPECIFIC) -->
+        @else if (mode() === 'signup') {
+          <div class="auth-form">
+            <div class="form-header">
+              <h2>Register as {{ currentRoleInfo()?.title }}</h2>
+              <p class="muted">Fill in your {{ currentRoleInfo()?.title }} credentials & designation</p>
+            </div>
+
+            @if (createdWorkspace(); as ws) {
+              <div class="workspace-success-card">
+                <div class="success-icon">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                </div>
+                <h3>{{ ws.role }} Registration Complete!</h3>
+                <p>Your role-based account has been created.</p>
+
+                <div class="workspace-details">
+                  <div class="detail-row">
+                    <span>Name:</span>
+                    <strong>{{ ws.name }}</strong>
+                  </div>
+                  <div class="detail-row">
+                    <span>Account Email:</span>
+                    <strong>{{ ws.email }}</strong>
+                  </div>
+                  <div class="detail-row">
+                    <span>Role Credentials:</span>
+                    <code class="domain-badge">{{ ws.details }}</code>
+                  </div>
+                </div>
+
+                <button type="button" class="submit-btn full-width margin-top" (click)="switchMode('login')">
+                  <span>Sign In as {{ ws.role }}</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <polyline points="12 5 19 12 12 19"/>
+                  </svg>
+                </button>
+              </div>
+            } @else {
+
+              <!-- DOCTOR SIGNUP FORM -->
+              @if (selectedRole() === 'doctor') {
+                <form [formGroup]="doctorForm" (ngSubmit)="submitSignup()" class="inner-form">
+                  <div class="input-field">
+                    <label for="docName">Doctor Full Name</label>
+                    <input id="docName" formControlName="fullName" placeholder="e.g. Dr. Sarah Jenkins" class="styled-input" />
+                  </div>
+                  <div class="input-grid-2">
+                    <div class="input-field">
+                      <label for="docLicense">Medical License #</label>
+                      <input id="docLicense" formControlName="licenseNumber" placeholder="e.g. MD-994821" class="styled-input" />
+                    </div>
+                    <div class="input-field">
+                      <label for="docSpecialty">Specialty</label>
+                      <select id="docSpecialty" formControlName="specialty" class="select-input">
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="General Surgery">General Surgery</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="input-grid-2">
+                    <div class="input-field">
+                      <label for="docQual">Qualification</label>
+                      <input id="docQual" formControlName="qualification" placeholder="e.g. MD, FACC" class="styled-input" />
+                    </div>
+                    <div class="input-field">
+                      <label for="docDept">Department</label>
+                      <input id="docDept" formControlName="department" placeholder="e.g. Cardiology Unit" class="styled-input" />
+                    </div>
+                  </div>
+                  <div class="input-field">
+                    <label for="docEmail">Work Email</label>
+                    <input id="docEmail" formControlName="email" type="email" placeholder="doctor@hospital.com" class="styled-input" />
+                  </div>
+                  <div class="input-field">
+                    <label for="docPass">Password</label>
+                    <input id="docPass" formControlName="password" type="password" placeholder="Min 6 characters" class="styled-input" />
+                  </div>
+                  <button type="submit" class="submit-btn" [disabled]="saving() || doctorForm.invalid">Register Doctor Account</button>
+                </form>
+              }
+
+              <!-- SUPPLIER SIGNUP FORM -->
+              @else if (selectedRole() === 'supplier') {
+                <form [formGroup]="supplierForm" (ngSubmit)="submitSignup()" class="inner-form">
+                  <div class="input-field">
+                    <label for="supCompany">Supplier Company Name</label>
+                    <input id="supCompany" formControlName="companyName" placeholder="e.g. Apex Surgical & Pharma Supplies" class="styled-input" />
+                  </div>
+                  <div class="input-grid-2">
+                    <div class="input-field">
+                      <label for="supTax">Business Tax ID / NTN</label>
+                      <input id="supTax" formControlName="taxId" placeholder="e.g. TAX-8849201" class="styled-input" />
+                    </div>
+                    <div class="input-field">
+                      <label for="supCat">Supply Category</label>
+                      <select id="supCat" formControlName="supplyCategory" class="select-input">
+                        <option value="Pharmaceuticals">Pharmaceuticals</option>
+                        <option value="Surgical Instruments">Surgical Instruments</option>
+                        <option value="Diagnostic Reagents">Diagnostic Reagents</option>
+                        <option value="Hospital Consumables">Hospital Consumables</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="input-grid-2">
+                    <div class="input-field">
+                      <label for="supContact">Contact Person</label>
+                      <input id="supContact" formControlName="contactPerson" placeholder="e.g. Robert Miller" class="styled-input" />
+                    </div>
+                    <div class="input-field">
+                      <label for="supPhone">Phone</label>
+                      <input id="supPhone" formControlName="phone" placeholder="+1 (555) 019-2831" class="styled-input" />
+                    </div>
+                  </div>
+                  <div class="input-field">
+                    <label for="supEmail">Business Email</label>
+                    <input id="supEmail" formControlName="email" type="email" placeholder="sales@apexsupplies.com" class="styled-input" />
+                  </div>
+                  <div class="input-field">
+                    <label for="supPass">Password</label>
+                    <input id="supPass" formControlName="password" type="password" placeholder="Min 6 characters" class="styled-input" />
+                  </div>
+                  <button type="submit" class="submit-btn" [disabled]="saving() || supplierForm.invalid">Register Supplier Account</button>
+                </form>
+              }
+
+              <!-- BUYER / PROCUREMENT SIGNUP FORM -->
+              @else if (selectedRole() === 'buyer') {
+                <form [formGroup]="buyerForm" (ngSubmit)="submitSignup()" class="inner-form">
+                  <div class="input-field">
+                    <label for="buyerName">Procurement Officer Name</label>
+                    <input id="buyerName" formControlName="fullName" placeholder="e.g. Marcus Vance" class="styled-input" />
+                  </div>
+                  <div class="input-grid-2">
+                    <div class="input-field">
+                      <label for="buyerEmp">Employee ID</label>
+                      <input id="buyerEmp" formControlName="employeeId" placeholder="e.g. EMP-7741" class="styled-input" />
+                    </div>
+                    <div class="input-field">
+                      <label for="buyerLimit">Purchase Authority Limit</label>
+                      <select id="buyerLimit" formControlName="approvalLimit" class="select-input">
+                        <option value="$10,000 Tier">$10,000 Tier</option>
+                        <option value="$50,000 Tier">$50,000 Tier</option>
+                        <option value="$250,000 Enterprise Tier">$250,000 Enterprise Tier</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="input-field">
+                    <label for="buyerDept">Department</label>
+                    <input id="buyerDept" formControlName="department" placeholder="e.g. Procurement & Logistics" class="styled-input" />
+                  </div>
+                  <div class="input-field">
+                    <label for="buyerEmail">Work Email</label>
+                    <input id="buyerEmail" formControlName="email" type="email" placeholder="buyer@hospital.com" class="styled-input" />
+                  </div>
+                  <div class="input-field">
+                    <label for="buyerPass">Password</label>
+                    <input id="buyerPass" formControlName="password" type="password" placeholder="Min 6 characters" class="styled-input" />
+                  </div>
+                  <button type="submit" class="submit-btn" [disabled]="saving() || buyerForm.invalid">Register Buyer Account</button>
+                </form>
+              }
+
+              <!-- LAB TECH SIGNUP FORM -->
+              @else if (selectedRole() === 'labtech') {
+                <form [formGroup]="labTechForm" (ngSubmit)="submitSignup()" class="inner-form">
+                  <div class="input-field">
+                    <label for="labName">Technician Name</label>
+                    <input id="labName" formControlName="fullName" placeholder="e.g. Elena Rostova" class="styled-input" />
+                  </div>
+                  <div class="input-grid-2">
+                    <div class="input-field">
+                      <label for="labCert">Certification ID</label>
+                      <input id="labCert" formControlName="certificationId" placeholder="e.g. LAB-8821" class="styled-input" />
+                    </div>
+                    <div class="input-field">
+                      <label for="labSec">Lab Section</label>
+                      <select id="labSec" formControlName="labSection" class="select-input">
+                        <option value="Clinical Biochemistry">Clinical Biochemistry</option>
+                        <option value="Hematology">Hematology</option>
+                        <option value="Microbiology">Microbiology</option>
+                        <option value="Histopathology">Histopathology</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="input-field">
+                    <label for="labEmail">Work Email</label>
+                    <input id="labEmail" formControlName="email" type="email" placeholder="labtech@hospital.com" class="styled-input" />
+                  </div>
+                  <div class="input-field">
+                    <label for="labPass">Password</label>
+                    <input id="labPass" formControlName="password" type="password" placeholder="Min 6 characters" class="styled-input" />
+                  </div>
+                  <button type="submit" class="submit-btn" [disabled]="saving() || labTechForm.invalid">Register Lab Tech Account</button>
+                </form>
+              }
+
+              <!-- PHARMACIST SIGNUP FORM -->
+              @else if (selectedRole() === 'pharmacist') {
+                <form [formGroup]="pharmacistForm" (ngSubmit)="submitSignup()" class="inner-form">
+                  <div class="input-field">
+                    <label for="pharmName">Pharmacist Name</label>
+                    <input id="pharmName" formControlName="fullName" placeholder="e.g. David Chen" class="styled-input" />
+                  </div>
+                  <div class="input-grid-2">
+                    <div class="input-field">
+                      <label for="pharmLic">Pharmacy License #</label>
+                      <input id="pharmLic" formControlName="pharmacyLicense" placeholder="e.g. PH-99381" class="styled-input" />
+                    </div>
+                    <div class="input-field">
+                      <label for="pharmWard">Assigned Ward / Unit</label>
+                      <input id="pharmWard" formControlName="assignedWard" placeholder="e.g. Central Pharmacy" class="styled-input" />
+                    </div>
+                  </div>
+                  <div class="input-field">
+                    <label for="pharmEmail">Work Email</label>
+                    <input id="pharmEmail" formControlName="email" type="email" placeholder="pharmacist@hospital.com" class="styled-input" />
+                  </div>
+                  <div class="input-field">
+                    <label for="pharmPass">Password</label>
+                    <input id="pharmPass" formControlName="password" type="password" placeholder="Min 6 characters" class="styled-input" />
+                  </div>
+                  <button type="submit" class="submit-btn" [disabled]="saving() || pharmacistForm.invalid">Register Pharmacist Account</button>
+                </form>
+              }
+
+              <!-- PATIENT SIGNUP FORM -->
+              @else if (selectedRole() === 'patient') {
+                <form [formGroup]="patientForm" (ngSubmit)="submitSignup()" class="inner-form">
+                  <div class="input-field">
+                    <label for="patName">Patient Full Name</label>
+                    <input id="patName" formControlName="fullName" placeholder="e.g. Eleanor Vance" class="styled-input" />
+                  </div>
+                  <div class="input-grid-2">
+                    <div class="input-field">
+                      <label for="patBlood">Blood Group</label>
+                      <select id="patBlood" formControlName="bloodGroup" class="select-input">
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="AB+">AB+</option>
+                      </select>
+                    </div>
+                    <div class="input-field">
+                      <label for="patIns">Insurance Policy #</label>
+                      <input id="patIns" formControlName="insurancePolicy" placeholder="e.g. POL-554109" class="styled-input" />
+                    </div>
+                  </div>
+                  <div class="input-field">
+                    <label for="patEmerg">Emergency Contact Phone</label>
+                    <input id="patEmerg" formControlName="emergencyContact" placeholder="+1 (555) 991-0023" class="styled-input" />
+                  </div>
+                  <div class="input-field">
+                    <label for="patEmail">Personal Email</label>
+                    <input id="patEmail" formControlName="email" type="email" placeholder="eleanor.vance@example.com" class="styled-input" />
+                  </div>
+                  <div class="input-field">
+                    <label for="patPass">Password</label>
+                    <input id="patPass" formControlName="password" type="password" placeholder="Min 6 characters" class="styled-input" />
+                  </div>
+                  <button type="submit" class="submit-btn" [disabled]="saving() || patientForm.invalid">Create Patient Portal Account</button>
+                </form>
+              }
+
+              <!-- ADMIN SIGNUP FORM -->
+              @else {
+                <form [formGroup]="adminForm" (ngSubmit)="submitSignup()" class="inner-form">
+                  <div class="input-field">
+                    <label for="admTenant">Hospital / Organization Name</label>
+                    <input id="admTenant" formControlName="tenantName" placeholder="e.g. St. Jude Hospital" class="styled-input" />
+                  </div>
+                  <div class="input-field">
+                    <label for="admName">Admin Full Name</label>
+                    <input id="admName" formControlName="fullName" placeholder="e.g. Dr. Alex Morgan" class="styled-input" />
+                  </div>
+                  <div class="input-field">
+                    <label for="admEmail">Work Email</label>
+                    <input id="admEmail" formControlName="email" type="email" placeholder="admin@hospital.com" class="styled-input" />
+                  </div>
+                  <div class="input-field">
+                    <label for="admPass">Password</label>
+                    <input id="admPass" formControlName="password" type="password" placeholder="Min 6 characters" class="styled-input" />
+                  </div>
+                  <button type="submit" class="submit-btn" [disabled]="saving() || adminForm.invalid">Create Admin Workspace</button>
+                </form>
+              }
+
+            }
+
+            <div class="form-footer">
+              <span>Already have an account?</span>
+              <button type="button" class="link-btn bold" (click)="switchMode('login')">Sign In</button>
+            </div>
+          </div>
+        }
+
+        <!-- FORGOT PASSWORD VIEW -->
+        @else if (mode() === 'forgot') {
+          <form [formGroup]="forgotForm" (ngSubmit)="submitForgot()" class="auth-form">
+            <div class="form-header">
+              <h2>Reset Password</h2>
+              <p class="muted">We'll send {{ currentRoleInfo()?.title }} account recovery instructions</p>
+            </div>
+
+            @if (successMessage()) {
+              <div class="alert alert-success">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <span>{{ successMessage() }}</span>
+              </div>
+            } @else {
+              <div class="input-field">
+                <label for="forgotEmail">Work Email</label>
+                <div class="input-wrapper">
+                  <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                  <input
+                    id="forgotEmail"
+                    formControlName="email"
+                    type="email"
+                    placeholder="you@hospital.com" />
+                </div>
+              </div>
+
+              <button type="submit" class="submit-btn" [disabled]="saving() || forgotForm.invalid">
+                @if (saving()) {
+                  <span class="spinner"></span> Sending…
+                } @else {
+                  <span>Send Reset Link</span>
+                }
+              </button>
+            }
+
+            <div class="form-footer">
+              <button type="button" class="link-btn bold flex-center" (click)="switchMode('login')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="19" y1="12" x2="5" y2="12"/>
+                  <polyline points="12 19 5 12 12 5"/>
+                </svg>
+                Back to Sign In
+              </button>
+            </div>
+          </form>
+        }
+      }
+
+    </div>
+  </section>
+</main>
+

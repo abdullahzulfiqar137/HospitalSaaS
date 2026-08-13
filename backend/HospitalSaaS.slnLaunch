@@ -1,0 +1,11 @@
+[
+  {
+    "Name": "HospitalSaaS API",
+    "Projects": [
+      {
+        "Path": "src\\HospitalSaaS.Api\\HospitalSaaS.Api.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

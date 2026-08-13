@@ -1,0 +1,281 @@
+<header class="page">
+  <div>
+    <p>WORKFORCE DIRECTORY</p>
+    <h1>Clinical workforce</h1>
+    <span>Doctors, departments and hospital staff.</span>
+  </div>
+  @if (
+    (tab() === 'staff' && auth.hasPermission('Users.Create')) ||
+    (tab() !== 'staff' && auth.hasPermission('Doctors.Create'))
+  ) {
+    <button (click)="createOpen.set(true)">+ Add {{ singular().toLowerCase() }}</button>
+  }
+</header>
+<nav>
+  <a routerLink="/doctors" [class.active]="tab() === 'doctors'">Doctors</a
+  ><a routerLink="/departments" [class.active]="tab() === 'departments'">Departments</a
+  ><a routerLink="/staff" [class.active]="tab() === 'staff'">Staff</a>
+</nav>
+<section class="metrics">
+  <div>
+    <small>DOCTORS</small><b>{{ doctors().length }}</b>
+  </div>
+  <div>
+    <small>DEPARTMENTS</small><b>{{ departments().length }}</b>
+  </div>
+  <div>
+    <small>STAFF</small><b>{{ staff().length }}</b>
+  </div>
+</section>
+<section class="card">
+  <div class="tools">
+    <input #q placeholder="Search workforce" (input)="search.set(q.value)" /><button
+      (click)="load()"
+    >
+      Refresh
+    </button>
+  </div>
+  @if (loading()) {
+    <div class="empty">Loading workforce…</div>
+  } @else if (tab() === 'doctors') {
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Doctor</th>
+            <th>Specialization</th>
+            <th>Department</th>
+            <th>Contact</th>
+            <th>Fee</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (doctor of filteredDoctors(); track doctor.id) {
+            <tr>
+              <td>
+                <b>{{ doctor.employeeNumber }}</b>
+              </td>
+              <td>
+                {{ doctor.firstName }} {{ doctor.lastName
+                }}<small>{{ doctor.licenseNumber }}</small>
+              </td>
+              <td>{{ doctor.specialization }}</td>
+              <td>{{ departmentName(doctor.departmentId) }}</td>
+              <td>{{ doctor.email || doctor.phone || '—' }}</td>
+              <td>{{ doctor.consultationFee | currency }}</td>
+              <td>
+                <span class="status" [class.inactive]="doctor.status !== 'Active'">{{
+                  doctor.status
+                }}</span>
+              </td>
+              <td>
+                @if (auth.hasPermission('Doctors.Update')) {
+                  <button class="link" (click)="setDoctorStatus(doctor)">
+                    {{ doctor.status === 'Active' ? 'Deactivate' : 'Activate' }}
+                  </button>
+                }
+                @if (auth.hasPermission('Doctors.Delete')) {
+                  <button
+                    class="link danger"
+                    (click)="
+                      pendingDelete.set({
+                        type: 'doctor',
+                        id: doctor.id,
+                        name: doctor.firstName + ' ' + doctor.lastName,
+                      })
+                    "
+                  >
+                    Delete
+                  </button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="empty">No doctors found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else if (tab() === 'departments') {
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Department</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (department of filteredDepartments(); track department.id) {
+            <tr>
+              <td>
+                <b>{{ department.code }}</b>
+              </td>
+              <td>{{ department.name }}</td>
+              <td>{{ department.description || '—' }}</td>
+              <td>
+                <span class="status">{{ department.status }}</span>
+              </td>
+              <td>
+                @if (auth.hasPermission('Doctors.Delete')) {
+                  <button
+                    class="link danger"
+                    (click)="
+                      pendingDelete.set({
+                        type: 'department',
+                        id: department.id,
+                        name: department.name,
+                      })
+                    "
+                  >
+                    Delete
+                  </button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty">No departments found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Name</th>
+            <th>Job title</th>
+            <th>Department</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (member of filteredStaff(); track member.id) {
+            <tr>
+              <td>
+                <b>{{ member.employeeNumber }}</b>
+              </td>
+              <td>{{ member.firstName }} {{ member.lastName }}</td>
+              <td>{{ member.jobTitle }}</td>
+              <td>{{ departmentName(member.departmentId) }}</td>
+              <td>
+                <span class="status" [class.inactive]="!member.isActive">{{
+                  member.isActive ? 'Active' : 'Inactive'
+                }}</span>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty">No staff found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
+@if (createOpen()) {
+  <div class="backdrop">
+    <form
+      class="modal"
+      (ngSubmit)="create()"
+      [formGroup]="
+        tab() === 'doctors' ? doctorForm : tab() === 'departments' ? departmentForm : staffForm
+      "
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="create-title"
+    >
+      <header>
+        <div>
+          <small>NEW RECORD</small>
+          <h2 id="create-title">Add {{ singular().toLowerCase() }}</h2>
+        </div>
+        <button type="button" aria-label="Close" (click)="createOpen.set(false)">×</button>
+      </header>
+      <div class="fields">
+        @if (tab() === 'doctors') {
+          <label>Employee number *<input formControlName="employeeNumber" /></label
+          ><label>First name *<input formControlName="firstName" /></label
+          ><label>Last name *<input formControlName="lastName" /></label
+          ><label
+            >Specialization *<select formControlName="specialization">
+              <option value="">Select specialization</option>
+              @for (spec of specializations; track spec) {
+                <option [value]="spec">{{ spec }}</option>
+              }
+            </select></label
+          ><label
+            >Department *<select formControlName="departmentId">
+              <option value="">Select department</option>
+              @for (department of allAvailableDepartments(); track department.id) {
+                <option [value]="department.id">{{ department.name }}</option>
+              }
+            </select></label
+          ><label>License number *<input formControlName="licenseNumber" /></label
+          ><label>Email<input type="email" formControlName="email" /></label
+          ><label>Phone
+            <div class="phone-input-group">
+              <app-country-selector mode="phone"></app-country-selector>
+              <input formControlName="phone" placeholder="300 1234567" />
+            </div>
+          </label
+          ><label
+            >Consultation fee *<input type="number" min="0" formControlName="consultationFee"
+          /></label>
+        } @else if (tab() === 'departments') {
+          <label>Name *<input formControlName="name" /></label
+          ><label>Code *<input formControlName="code" /></label
+          ><label class="wide"
+            >Description<textarea rows="3" formControlName="description"></textarea>
+          </label>
+        } @else {
+          <label>Employee number *<input formControlName="employeeNumber" /></label
+          ><label>First name *<input formControlName="firstName" /></label
+          ><label>Last name *<input formControlName="lastName" /></label
+          ><label
+            >Job title *<select formControlName="jobTitle">
+              <option value="">Select job title</option>
+              @for (title of jobTitles; track title) {
+                <option [value]="title">{{ title }}</option>
+              }
+            </select></label
+          ><label
+            >Department<select formControlName="departmentId">
+              <option [ngValue]="null">Unassigned</option>
+              @for (department of departments(); track department.id) {
+                <option [value]="department.id">{{ department.name }}</option>
+              }
+            </select></label
+          >
+        }
+      </div>
+      <footer>
+        <button type="button" class="secondary" (click)="createOpen.set(false)">Cancel</button
+        ><button [disabled]="saving()">{{ saving() ? 'Saving…' : 'Create' }}</button>
+      </footer>
+    </form>
+  </div>
+}
+@if (pendingDelete(); as target) {
+  <app-confirmation-dialog
+    title="Delete record?"
+    [message]="target.name + ' will no longer be available in hospital operations.'"
+    confirmLabel="Delete"
+    [busy]="saving()"
+    (cancelled)="pendingDelete.set(null)"
+    (confirmed)="confirmDelete()"
+  />
+}

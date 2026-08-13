@@ -1,0 +1,95 @@
+<header class="page">
+  <a routerLink="/patients">← Patients</a>
+  <h1>{{ id ? 'Edit patient' : 'Register a patient' }}</h1>
+  <p>Fields match the backend patient contract. Required fields are marked.</p>
+</header>
+@if (loading()) {
+  <div class="card loading">Loading patient record…</div>
+} @else {
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+    <h2>Personal information</h2>
+    <div class="grid">
+      <label>First name *<input formControlName="firstName" /></label
+      ><label>Last name *<input formControlName="lastName" /></label
+      ><label>Date of birth *<input type="date" formControlName="dateOfBirth" /></label
+      ><label
+        >Gender *<select formControlName="gender">
+          <option value="">Select</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select></label
+      >
+      @if (id) {
+        <label>Blood group
+          <select formControlName="bloodGroup">
+            <option value="">Select blood group</option>
+            <option>A+</option>
+            <option>A-</option>
+            <option>B+</option>
+            <option>B-</option>
+            <option>AB+</option>
+            <option>AB-</option>
+            <option>O+</option>
+            <option>O-</option>
+          </select>
+        </label>
+      }
+      <label>Marital status
+        <select formControlName="maritalStatus">
+          <option value="">Select status</option>
+          <option>Single</option>
+          <option>Married</option>
+          <option>Divorced</option>
+          <option>Widowed</option>
+        </select>
+      </label>
+      <label class="wide-label">National ID / Document Card
+        <div class="phone-input-group">
+          <app-country-selector mode="id" (countrySelected)="onIdCountryChange($event)"></app-country-selector>
+          <input
+            formControlName="nationalId"
+            [placeholder]="nationalIdPlaceholder()"
+            [attr.maxlength]="nationalIdMaxLength()"
+            (input)="onNationalIdInput($event)"
+          />
+        </div>
+      </label>
+    </div>
+    <h2>Contact and emergency details</h2>
+    <div class="grid">
+      <label>Email<input type="email" formControlName="email" /></label
+      ><label class="wide-label">Phone
+        <div class="phone-input-group">
+          <app-country-selector mode="phone" (countrySelected)="onPhoneCountryChange($event)"></app-country-selector>
+          <input
+            formControlName="phone"
+            [placeholder]="phonePlaceholder()"
+            [attr.maxlength]="phoneMaxLength()"
+            (input)="onPhoneInput($event)"
+          />
+        </div>
+      </label>
+      <label class="wide-label">Emergency phone
+        <div class="phone-input-group">
+          <app-country-selector mode="phone" (countrySelected)="onEmergencyPhoneCountryChange($event)"></app-country-selector>
+          <input
+            formControlName="emergencyContactPhone"
+            [placeholder]="emergencyPhonePlaceholder()"
+            [attr.maxlength]="emergencyPhoneMaxLength()"
+            (input)="onEmergencyPhoneInput($event)"
+          />
+        </div>
+      </label
+      ><label class="wide">Address<textarea formControlName="address"></textarea></label
+      ><label class="wide">Clinical notes<textarea formControlName="notes"></textarea></label>
+    </div>
+    <footer>
+      <button type="button" class="secondary" (click)="form.reset()">Reset</button><span></span
+      ><a routerLink="/patients">Cancel</a
+      ><button type="submit" [disabled]="saving() || form.invalid">
+        {{ saving() ? 'Saving…' : id ? 'Save changes' : 'Register patient' }}
+      </button>
+    </footer>
+  </form>
+}

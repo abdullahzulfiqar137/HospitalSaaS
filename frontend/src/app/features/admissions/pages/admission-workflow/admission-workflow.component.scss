@@ -1,0 +1,265 @@
+:host {
+  display: block;
+  max-width: 1400px;
+  margin: auto;
+}
+.page-header p,
+.card header p {
+  margin: 0 0 6px;
+  color: #07838f;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 1.4px;
+}
+.page-header h1 {
+  font-size: 31px;
+  margin: 0 0 6px;
+  color: #173344;
+}
+.page-header span,
+.card header span {
+  color: #758590;
+}
+.card {
+  background: #fff;
+  border: 1px solid #e3eaee;
+  border-radius: 16px;
+  padding: 23px;
+  margin-top: 18px;
+  box-shadow: 0 4px 16px #13303f08;
+}
+.lookup {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.7fr) 1.3fr;
+  gap: 20px;
+  align-items: end;
+}
+.lookup > div:first-child {
+  display: grid;
+  gap: 5px;
+}
+.lookup label {
+  font-size: 15px;
+  font-weight: 750;
+}
+.lookup small {
+  color: #81909a;
+}
+.lookup-control {
+  display: flex;
+  gap: 9px;
+}
+.lookup-control input {
+  flex: 1;
+}
+.form-error {
+  grid-column: 1/-1;
+  color: #b73838;
+  margin: 0;
+  font-size: 12px;
+}
+.card > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  border-bottom: 1px solid #edf1f3;
+  padding-bottom: 16px;
+  margin-bottom: 19px;
+}
+.card h2 {
+  margin: 0;
+  color: #173344;
+  font-size: 19px;
+}
+.status {
+  color: #087f69 !important;
+  background: #e9f8f3;
+  padding: 7px 11px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.status.discharged {
+  color: #687985 !important;
+  background: #edf1f3;
+}
+.details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 28px;
+}
+.details div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.details small {
+  color: #83919b;
+  font-size: 11px;
+}
+.details b {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.wide {
+  grid-column: 1/-1;
+}
+.card footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #edf1f3;
+  margin-top: 20px;
+  padding-top: 17px;
+}
+.create footer span {
+  margin-right: auto;
+  color: #84939d;
+  font-size: 11px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+label {
+  display: grid;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 750;
+  color: #526773;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid #d6e0e5;
+  border-radius: 9px;
+  padding: 11px 12px;
+  color: #173344;
+  background: #fff;
+}
+textarea {
+  resize: vertical;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #1b9ba4;
+  outline: 3px solid #1b9ba414;
+}
+button {
+  border: 0;
+  background: #087f8c;
+  color: #fff;
+  border-radius: 9px;
+  padding: 11px 16px;
+  font-weight: 700;
+  font-size: 12px;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.secondary {
+  color: #34505f;
+  background: #edf2f4;
+}
+.danger {
+  background: #ba4141;
+}
+.timeline article {
+  display: grid;
+  grid-template-columns: 15px 1fr;
+  gap: 12px;
+  padding: 8px 3px 17px;
+}
+.timeline article i {
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: #1aa696;
+  box-shadow: 0 0 0 5px #e5f6f3;
+}
+.timeline article > div {
+  display: grid;
+  gap: 4px;
+}
+.timeline article span,
+.timeline article small {
+  color: #71838e;
+}
+.timeline article p {
+  margin: 3px 0 0;
+}
+.empty {
+  text-align: center;
+  padding: 25px;
+  color: #81909a;
+  background: #f8fafb;
+  border-radius: 10px;
+}
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: #102a3a88;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  z-index: 50;
+  backdrop-filter: blur(3px);
+}
+.modal {
+  width: min(720px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 23px;
+  box-shadow: 0 24px 70px #102a3a55;
+}
+.modal .close {
+  background: transparent;
+  color: #607580;
+  font-size: 23px;
+  padding: 0;
+}
+.confirm {
+  width: min(430px, 100%);
+  text-align: center;
+}
+.warning {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 13px;
+  background: #fff0ed;
+  color: #b93f3f;
+  font-size: 20px;
+  font-weight: 900;
+}
+.confirm p {
+  color: #687985;
+}
+.confirm footer {
+  justify-content: center;
+}
+@media (max-width: 800px) {
+  .lookup {
+    grid-template-columns: 1fr;
+  }
+  .grid,
+  .details {
+    grid-template-columns: 1fr;
+  }
+  .wide {
+    grid-column: auto;
+  }
+  .lookup-control {
+    flex-direction: column;
+  }
+}

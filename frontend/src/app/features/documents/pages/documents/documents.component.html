@@ -1,0 +1,46 @@
+<header>
+  <p>SECURE FILES</p>
+  <h1>Documents</h1>
+  <span>Patient document storage with a 20 MB upload limit.</span>
+</header>
+<section class="upload">
+  <label>Patient ID<input [formControl]="patientId" /></label
+  ><label class="file"
+    ><b>{{ file()?.name || 'Choose file' }}</b
+    ><input type="file" (change)="choose($event)" /></label
+  ><button (click)="upload()" [disabled]="uploading() || !file() || patientId.invalid">
+    {{ uploading() ? 'Uploading…' : 'Upload' }}
+  </button>
+</section>
+@if (pendingDelete()) {
+  <app-confirmation-dialog
+    title="Delete document?"
+    message="This document will be permanently removed from hospital storage."
+    confirmLabel="Delete document"
+    [busy]="deleting()"
+    (cancelled)="pendingDelete.set(null)"
+    (confirmed)="confirmDelete()"
+  />
+}
+<section class="list">
+  <div class="filter">
+    <input [formControl]="filter" placeholder="Patient GUID" /><button (click)="load()">
+      Filter
+    </button>
+  </div>
+  @if (loading()) {
+    <p>Loading…</p>
+  }
+  @for (doc of documents(); track doc.id) {
+    <article>
+      <div>
+        <b>{{ doc.name }}</b
+        ><small>{{ doc.contentType }} · {{ doc.size / 1024 | number: '1.0-0' }} KB</small
+        ><span>Patient {{ doc.patientId }}</span>
+      </div>
+      <button (click)="remove(doc.id)">Delete</button>
+    </article>
+  } @empty {
+    <p>No documents found.</p>
+  }
+</section>

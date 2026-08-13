@@ -1,0 +1,203 @@
+:host {
+  display: block;
+}
+.page {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+.page p,
+.modal small {
+  font-size: 11px;
+  color: #087f8c;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+}
+.page h1 {
+  margin: 5px 0;
+}
+.page span,
+.muted {
+  color: #718096;
+}
+.page button,
+.modal footer button {
+  border: 0;
+  background: #087f8c;
+  color: #fff;
+  border-radius: 9px;
+  padding: 11px 15px;
+}
+.filters {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  margin: 20px 0 14px;
+  background: #fff;
+  border: 1px solid #e5ebef;
+  border-radius: 12px;
+  padding: 14px;
+}
+.filters label {
+  display: grid;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.filters button {
+  border: 0;
+  background: transparent;
+  color: #087f8c;
+  padding: 10px;
+}
+.card {
+  background: #fff;
+  border: 1px solid #e5ebef;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.table {
+  overflow: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  padding: 14px 16px;
+  border-bottom: 1px solid #edf1f3;
+  font-size: 13px;
+  white-space: nowrap;
+}
+th {
+  background: #fafcfd;
+  color: #718096;
+}
+td small {
+  display: block;
+  color: #718096;
+  margin-top: 4px;
+}
+.status {
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #e9f2ff;
+  color: #175cd3;
+  font-weight: 700;
+}
+.status.done {
+  background: #e5f7ee;
+  color: #067647;
+}
+.status.cancelled {
+  background: #fef0f0;
+  color: #b42318;
+}
+.link {
+  border: 0;
+  background: transparent;
+  color: #087f8c;
+  font-weight: 700;
+}
+.link.danger {
+  color: #b42318;
+}
+.empty {
+  text-align: center;
+  padding: 55px;
+  color: #718096;
+}
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: #0b2533aa;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+.modal {
+  width: min(800px, 100%);
+  max-height: 92vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 15px;
+}
+.modal.small {
+  width: min(500px, 100%);
+}
+.modal > header {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 23px;
+  border-bottom: 1px solid #edf1f3;
+}
+.modal h2 {
+  margin: 4px 0;
+}
+.modal header button {
+  border: 0;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  font-size: 20px;
+}
+.fields {
+  padding: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+.fields.single {
+  grid-template-columns: 1fr;
+}
+.fields label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.fields .wide {
+  grid-column: 1/-1;
+}
+input,
+select,
+textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid #d8e1e7;
+  border-radius: 8px;
+  padding: 10px;
+  font: inherit;
+}
+.modal footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 16px 22px;
+  border-top: 1px solid #edf1f3;
+}
+.modal footer .secondary {
+  background: #edf2f4;
+  color: #40515b;
+}
+.modal footer .danger-btn {
+  background: #b42318;
+}
+@media (max-width: 650px) {
+  .page span {
+    display: none;
+  }
+  .filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .fields {
+    grid-template-columns: 1fr;
+  }
+  .fields .wide {
+    grid-column: auto;
+  }
+}

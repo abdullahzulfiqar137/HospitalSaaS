@@ -1,0 +1,242 @@
+<header class="page">
+  <div>
+    <p>CLINICAL CARE</p>
+    <h1>{{ mode() === 'records' ? 'Medical records' : 'Prescriptions' }}</h1>
+    <span>{{
+      mode() === 'records'
+        ? 'Document encounters, diagnoses and treatment plans.'
+        : 'Create safe, structured medication orders.'
+    }}</span>
+  </div>
+  @if (
+    auth.hasPermission(mode() === 'records' ? 'MedicalRecords.Create' : 'Prescriptions.Create')
+  ) {
+    <button (click)="modal.set(true)">
+      + {{ mode() === 'records' ? 'New record' : 'New prescription' }}
+    </button>
+  }
+</header>
+<section class="filters">
+  <label
+    >Patient<select
+      #patient
+      [value]="patientFilter()"
+      (change)="patientFilter.set(patient.value); load()"
+    >
+      <option value="">All patients</option>
+      @for (item of patients(); track item.id) {
+        <option [value]="item.id">
+          {{ formatPatientLabel(item) }}
+        </option>
+      }
+    </select></label
+  ><button (click)="patientFilter.set(''); load()">Clear filter</button>
+</section>
+<section class="card">
+  @if (loading()) {
+    <div class="empty">Loading clinical records...</div>
+  } @else if (mode() === 'records') {
+    <div class="records">
+      @for (record of records(); track record.id) {
+        <article>
+          <header>
+            <div>
+              <small>PATIENT ENCOUNTER</small>
+              <h3>{{ patientName(record.patientId) }}</h3>
+              <span>{{ doctorName(record.doctorId) }}</span>
+            </div>
+            @if (auth.hasPermission('MedicalRecords.Create')) {
+              <button class="danger" (click)="deleteRecord(record)">Delete</button>
+            }
+          </header>
+          <div class="summary">
+            <div>
+              <small>CHIEF COMPLAINT</small>
+              <p>{{ record.chiefComplaint }}</p>
+            </div>
+            <div>
+              <small>EXAMINATION</small>
+              <p>{{ record.examination || 'Not documented' }}</p>
+            </div>
+            <div>
+              <small>TREATMENT PLAN</small>
+              <p>{{ record.treatmentPlan || 'Not documented' }}</p>
+            </div>
+          </div>
+          <footer>
+            @for (diagnosis of record.diagnoses; track diagnosis.id) {
+              <span [class.primary]="diagnosis.isPrimary"
+                >{{ diagnosis.code }} · {{ diagnosis.description }}</span
+              >
+            }
+            @if (record.followUpDate) {
+              <b>Follow-up {{ record.followUpDate | date: 'mediumDate' }}</b>
+            }
+          </footer>
+        </article>
+      } @empty {
+        <div class="empty">No medical records found.</div>
+      }
+    </div>
+  } @else {
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Medicines</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (prescription of prescriptions(); track prescription.id) {
+            <tr>
+              <td>{{ prescription.dateUtc | date: 'mediumDate' }}</td>
+              <td>
+                <b>{{ patientName(prescription.patientId) }}</b>
+              </td>
+              <td>{{ doctorName(prescription.doctorId) }}</td>
+              <td>
+                <div class="medicines">
+                  @for (item of prescription.items; track item.id) {
+                    <span
+                      ><b>{{ medicineName(item.medicineId) }}</b> {{ item.dose }} ·
+                      {{ item.frequency }} · {{ item.duration }} · {{ item.route
+                      }}<small>{{ item.instructions }}</small></span
+                    >
+                  }
+                </div>
+              </td>
+              <td>{{ prescription.notes || '—' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty">No prescriptions found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
+@if (modal()) {
+  <div class="backdrop">
+    <form class="modal" (ngSubmit)="submit()">
+      <header>
+        <div>
+          <small>CLINICAL DOCUMENTATION</small>
+          <h2>{{ mode() === 'records' ? 'New medical record' : 'New prescription' }}</h2>
+        </div>
+        <button type="button" (click)="modal.set(false)" aria-label="Close">×</button>
+      </header>
+      @if (mode() === 'records') {
+        <div class="fields" [formGroup]="recordForm">
+          <label
+            >Patient *<select formControlName="patientId">
+              <option value="">Select patient</option>
+              @for (item of patients(); track item.id) {
+                <option [value]="item.id">
+                  {{ formatPatientLabel(item) }}
+                </option>
+              }
+            </select></label
+          ><label
+            >Doctor *<select formControlName="doctorId">
+              <option value="">Select doctor</option>
+              @for (item of doctors(); track item.id) {
+                <option [value]="item.id">Dr. {{ item.firstName }} {{ item.lastName }}</option>
+              }
+            </select></label
+          ><label class="wide">Chief complaint *<input formControlName="chiefComplaint" /></label
+          ><label>History<textarea rows="4" formControlName="history"></textarea></label
+          ><label>Examination<textarea rows="4" formControlName="examination"></textarea></label
+          ><label
+            >Clinical notes<textarea rows="4" formControlName="clinicalNotes"></textarea></label
+          ><label
+            >Treatment plan<textarea rows="4" formControlName="treatmentPlan"></textarea></label
+          ><label>Follow-up date<input type="date" formControlName="followUpDate" /></label>
+          <section class="wide lines" formArrayName="diagnoses">
+            <header>
+              <b>Diagnoses</b
+              ><button type="button" (click)="addDiagnosis()">+ Add diagnosis</button>
+            </header>
+            @for (group of diagnoses.controls; track $index) {
+              <div [formGroupName]="$index">
+                <input formControlName="code" placeholder="ICD code" /><input
+                  formControlName="description"
+                  placeholder="Description"
+                /><label class="check"
+                  ><input type="checkbox" formControlName="isPrimary" /> Primary</label
+                ><button type="button" class="danger" (click)="removeDiagnosis($index)">
+                  Remove
+                </button>
+              </div>
+            }
+          </section>
+        </div>
+      } @else {
+        <div class="fields" [formGroup]="prescriptionForm">
+          <label
+            >Patient *<select formControlName="patientId">
+              <option value="">Select patient</option>
+              @for (item of patients(); track item.id) {
+                <option [value]="item.id">
+                  {{ formatPatientLabel(item) }}
+                </option>
+              }
+            </select></label
+          ><label
+            >Doctor *<select formControlName="doctorId">
+              <option value="">Select doctor</option>
+              @for (item of doctors(); track item.id) {
+                <option [value]="item.id">Dr. {{ item.firstName }} {{ item.lastName }}</option>
+              }
+            </select></label
+          ><label class="wide">Notes<textarea rows="3" formControlName="notes"></textarea></label>
+          <section class="wide lines medicine-lines" formArrayName="items">
+            <header>
+              <b>Medicines</b><button type="button" (click)="addMedicine()">+ Add medicine</button>
+            </header>
+            @for (group of items.controls; track $index) {
+              <div [formGroupName]="$index">
+                <select formControlName="medicineId">
+                  <option value="">Medicine</option>
+                  @for (medicine of medicines(); track medicine.id) {
+                    <option [value]="medicine.id">
+                      {{ medicine.name }} {{ medicine.strength }}
+                    </option>
+                  }</select
+                ><input formControlName="dose" placeholder="Dose" /><input
+                  formControlName="frequency"
+                  placeholder="Frequency"
+                /><input formControlName="duration" placeholder="Duration" /><select
+                  formControlName="route"
+                >
+                  <option>Oral</option>
+                  <option>IV</option>
+                  <option>IM</option>
+                  <option>Topical</option>
+                  <option>Inhalation</option></select
+                ><input formControlName="instructions" placeholder="Instructions" /><button
+                  type="button"
+                  class="danger"
+                  (click)="removeMedicine($index)"
+                >
+                  Remove
+                </button>
+              </div>
+            }
+          </section>
+        </div>
+      }
+      <footer>
+        <button type="button" class="secondary" (click)="modal.set(false)">Cancel</button
+        ><button [disabled]="saving()">
+          {{ saving() ? 'Saving...' : 'Save clinical record' }}
+        </button>
+      </footer>
+    </form>
+  </div>
+}

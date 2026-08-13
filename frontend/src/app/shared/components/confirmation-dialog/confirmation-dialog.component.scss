@@ -1,0 +1,64 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: #102a3a88;
+  backdrop-filter: blur(3px);
+}
+.dialog {
+  width: min(420px, 100%);
+  background: #fff;
+  border: 1px solid #e5eaee;
+  border-radius: 16px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 24px 70px #102a3a55;
+}
+.icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 13px;
+  border-radius: 50%;
+  background: #fff0ed;
+  color: #b93f3f;
+  font-size: 20px;
+  font-weight: 900;
+}
+.dialog h2 {
+  margin: 0 0 8px;
+  color: #173344;
+  font-size: 20px;
+}
+.dialog p {
+  margin: 0;
+  color: #6c7e89;
+  line-height: 1.55;
+}
+.dialog footer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 22px;
+}
+.dialog button {
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 17px;
+  font-weight: 700;
+}
+.cancel {
+  background: #edf2f4;
+  color: #34505f;
+}
+.confirm {
+  background: #ba4141;
+  color: #fff;
+}
+.confirm:disabled {
+  opacity: 0.6;
+}

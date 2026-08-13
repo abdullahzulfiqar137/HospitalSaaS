@@ -1,0 +1,278 @@
+:host {
+  display: block;
+}
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 20px;
+}
+.page-head p,
+.modal small {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  color: #087f8c;
+}
+.page-head h1 {
+  margin: 5px 0;
+  font-size: 30px;
+}
+.page-head span,
+.muted {
+  color: #718096;
+}
+.page-head button,
+.modal footer button {
+  border: 0;
+  border-radius: 9px;
+  padding: 12px 17px;
+  background: #087f8c;
+  color: #fff;
+}
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.tabs a {
+  padding: 10px 16px;
+  border-radius: 9px;
+  color: #52616b;
+  text-decoration: none;
+  font-weight: 700;
+}
+.tabs a.active {
+  background: #dff5f3;
+  color: #087f8c;
+}
+.card,
+.state {
+  background: #fff;
+  border: 1px solid #e3eaee;
+  border-radius: 15px;
+  overflow: hidden;
+}
+.state {
+  padding: 70px;
+  text-align: center;
+  color: #718096;
+}
+.summary {
+  display: flex;
+  gap: 50px;
+  padding: 20px;
+}
+.summary div {
+  display: grid;
+  gap: 5px;
+}
+.summary small {
+  font-size: 10px;
+  color: #718096;
+}
+.summary b {
+  font-size: 22px;
+}
+.table {
+  overflow: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  padding: 14px 17px;
+  border-top: 1px solid #edf1f3;
+  font-size: 13px;
+  white-space: nowrap;
+}
+th {
+  color: #718096;
+  background: #fafcfd;
+}
+.status {
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #e8f7f4;
+  color: #087f8c;
+  font-weight: 700;
+}
+.link {
+  border: 0;
+  background: transparent;
+  color: #087f8c;
+  font-weight: 700;
+  margin-left: 8px;
+}
+.link.danger,
+.refund {
+  color: #b42318;
+}
+.refund {
+  display: block;
+  font-size: 10px;
+  margin-top: 4px;
+}
+.empty {
+  text-align: center;
+  padding: 45px;
+  color: #718096;
+}
+.card footer,
+.modal footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 18px;
+  border-top: 1px solid #edf1f3;
+}
+.card footer div {
+  display: flex;
+  gap: 8px;
+}
+.card footer button {
+  border: 1px solid #dbe3e8;
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px 11px;
+}
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: #0b2533a8;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+.modal {
+  background: #fff;
+  width: min(1050px, 100%);
+  max-height: 92vh;
+  overflow: auto;
+  border-radius: 16px;
+}
+.modal.small,
+.modal.details {
+  width: min(520px, 100%);
+}
+.modal > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e7ecef;
+}
+.modal h2 {
+  margin: 3px 0;
+}
+.modal header button {
+  border: 0;
+  background: #edf2f4;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  font-size: 20px;
+}
+.body {
+  padding: 23px;
+}
+.body > label {
+  display: grid;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+input,
+select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d8e1e7;
+  border-radius: 8px;
+  padding: 10px;
+  font: inherit;
+}
+.line-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 10px;
+}
+.line-head button {
+  border: 0;
+  background: transparent;
+  color: #087f8c;
+  font-weight: 700;
+}
+.item {
+  display: grid;
+  grid-template-columns: 2fr repeat(4, 1fr) 35px;
+  gap: 9px;
+  align-items: end;
+  padding: 11px 0;
+  border-top: 1px solid #edf1f3;
+}
+.item label {
+  display: grid;
+  gap: 5px;
+  font-size: 11px;
+  color: #52616b;
+}
+.item > button {
+  height: 38px;
+  border: 0;
+  border-radius: 8px;
+}
+.grand,
+.line {
+  display: flex;
+  justify-content: space-between;
+  padding: 13px 0;
+  border-top: 1px solid #edf1f3;
+}
+.grand {
+  font-size: 18px;
+}
+.modal footer {
+  justify-content: flex-end;
+  gap: 10px;
+}
+.modal footer .secondary {
+  background: #edf2f4;
+  color: #40515b;
+}
+.modal footer .danger-btn {
+  background: #b42318;
+}
+@media (max-width: 850px) {
+  .item {
+    grid-template-columns: 1fr 1fr;
+  }
+  .item label:first-child {
+    grid-column: 1/-1;
+  }
+  .page-head span {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .page-head {
+    align-items: start;
+  }
+  .page-head h1 {
+    font-size: 24px;
+  }
+  .summary {
+    gap: 25px;
+  }
+  .item {
+    grid-template-columns: 1fr;
+  }
+  .item label:first-child {
+    grid-column: auto;
+  }
+}

@@ -1,0 +1,101 @@
+<header class="page">
+  <div>
+    <p>PAYER OPERATIONS</p>
+    <h1>Insurance policies</h1>
+    <span>Track patient coverage, providers and policy validity.</span>
+  </div>
+  @if (auth.hasPermission('Patients.Update')) {
+    <button (click)="modal.set(true)">+ Add policy</button>
+  }
+</header>
+<section class="filters">
+  <label
+    >Patient<select
+      #patient
+      [value]="patientFilter()"
+      (change)="patientFilter.set(patient.value); load()"
+    >
+      <option value="">All patients</option>
+      @for (p of patients(); track p.id) {
+        <option [value]="p.id">{{ p.patientNumber }} — {{ p.firstName }} {{ p.lastName }}</option>
+      }
+    </select></label
+  ><button (click)="patientFilter.set(''); load()">Clear</button>
+</section>
+<section class="card">
+  @if (loading()) {
+    <div class="empty">Loading insurance policies...</div>
+  } @else {
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Provider</th>
+            <th>Policy number</th>
+            <th>Coverage period</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (policy of policies(); track policy.id) {
+            <tr>
+              <td>
+                <b>{{ patientName(policy.patientId) }}</b>
+              </td>
+              <td>{{ policy.provider }}</td>
+              <td>{{ policy.policyNumber }}</td>
+              <td>
+                {{ policy.validFrom | date: 'mediumDate' }} —
+                {{ policy.validTo | date: 'mediumDate' }}
+              </td>
+              <td>
+                <span
+                  class="status"
+                  [class.active]="status(policy) === 'Active'"
+                  [class.expired]="status(policy) === 'Expired'"
+                  >{{ status(policy) }}</span
+                >
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty">No insurance policies found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
+@if (modal()) {
+  <div class="backdrop">
+    <form class="modal" [formGroup]="form" (ngSubmit)="save()">
+      <header>
+        <h2>Add insurance policy</h2>
+        <button type="button" (click)="modal.set(false)">×</button>
+      </header>
+      <div class="fields">
+        <label class="wide"
+          >Patient *<select formControlName="patientId">
+            <option value="">Select patient</option>
+            @for (p of patients(); track p.id) {
+              <option [value]="p.id">
+                {{ p.patientNumber }} — {{ p.firstName }} {{ p.lastName }}
+              </option>
+            }
+          </select></label
+        ><label>Provider *<input formControlName="provider" /></label
+        ><label>Policy number *<input formControlName="policyNumber" /></label
+        ><label>Valid from *<input type="date" formControlName="validFrom" /></label
+        ><label>Valid to *<input type="date" formControlName="validTo" /></label>
+      </div>
+      <footer>
+        <button type="button" class="secondary" (click)="modal.set(false)">Cancel</button
+        ><button [disabled]="saving() || form.invalid">
+          {{ saving() ? 'Saving...' : 'Save policy' }}
+        </button>
+      </footer>
+    </form>
+  </div>
+}

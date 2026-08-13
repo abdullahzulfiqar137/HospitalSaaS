@@ -1,0 +1,256 @@
+<div class="subscriptions-container">
+  <!-- Executive Banner -->
+  <header class="subscription-hero">
+    <div class="hero-content">
+      <span class="hero-badge">
+        <span class="pulse-dot"></span>
+        ENTERPRISE MULTI-TENANT SUITE
+      </span>
+      <h1>Hospital SaaS Subscriptions & Quotas</h1>
+      <p>Manage enterprise licensing, multi-facility nodes, quota usage, and billing statements.</p>
+    </div>
+
+    <div class="current-plan-card">
+      <div class="card-status-row">
+        <span class="status-indicator active">Active License</span>
+        <span class="tenant-id-badge">Tenant: {{ auth.user()?.tenantId?.slice(0, 8) || 'Main' }}</span>
+      </div>
+      <div class="plan-price">
+        <h2>Enterprise Hospital</h2>
+        <div class="amount-tag">
+          <b>$399</b><span>/ month</span>
+        </div>
+      </div>
+      <div class="renewal-info">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span>Renews on <b>Dec 31, 2026</b> (Annual Billing - 20% Discount Applied)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Quotas & Capacity Usage Section -->
+  <section class="quotas-section">
+    <div class="section-title-row">
+      <h2>Resource Capacity & Multi-Tenant Quotas</h2>
+      <span class="quota-health-tag">100% System Healthy</span>
+    </div>
+
+    <div class="quota-cards-grid">
+      <div class="quota-card">
+        <div class="quota-header">
+          <div class="quota-icon blue">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <div class="quota-meta">
+            <span class="quota-label">Clinical Staff Seats</span>
+            <b>142 / Unlimited</b>
+          </div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-fill blue" style="width: 35%"></div>
+        </div>
+        <small class="quota-sub">Doctor, Nurse, Pharmacist & Admin accounts</small>
+      </div>
+
+      <div class="quota-card">
+        <div class="quota-header">
+          <div class="quota-icon teal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 4v16"></path>
+              <path d="M2 8h18a2 2 0 0 1 2 2v10"></path>
+              <path d="M2 17h20"></path>
+              <circle cx="6" cy="12" r="2"></circle>
+            </svg>
+          </div>
+          <div class="quota-meta">
+            <span class="quota-label">Inpatient Bed Allocation</span>
+            <b>48 / 60 Beds</b>
+          </div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-fill teal" style="width: 80%"></div>
+        </div>
+        <small class="quota-sub">80% occupied across ICU & General Wards</small>
+      </div>
+
+      <div class="quota-card">
+        <div class="quota-header">
+          <div class="quota-icon purple">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <path d="M12 18v-6"></path>
+              <path d="M9 15h6"></path>
+            </svg>
+          </div>
+          <div class="quota-meta">
+            <span class="quota-label">Lab Orders This Month</span>
+            <b>1,250 / 5,000 Tests</b>
+          </div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-fill purple" style="width: 25%"></div>
+        </div>
+        <small class="quota-sub">Pathology & Radiology test processing</small>
+      </div>
+
+      <div class="quota-card">
+        <div class="quota-header">
+          <div class="quota-icon green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+              <line x1="6" y1="6" x2="6.01" y2="6"></line>
+              <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+          </div>
+          <div class="quota-meta">
+            <span class="quota-label">Encrypted EHR Storage</span>
+            <b>14.2 GB / 500 GB</b>
+          </div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-fill green" style="width: 15%"></div>
+        </div>
+        <small class="quota-sub">Medical imaging DICOM & patient records</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Plans & Upgrades -->
+  <section class="plans-section">
+    <div class="pricing-header-center">
+      <h2>Available Enterprise Plans</h2>
+      <p>Scale hospital operations seamlessly with dedicated multi-tenant isolation.</p>
+
+      <!-- Billing Toggle Switch -->
+      <div class="billing-toggle-wrapper">
+        <span [class.active]="!isAnnual()">Monthly Billing</span>
+        <button type="button" class="switch-btn" [class.on]="isAnnual()" (click)="toggleBillingCycle()">
+          <span class="switch-handle"></span>
+        </button>
+        <span [class.active]="isAnnual()" class="annual-label">
+          Annual Billing
+          <span class="discount-badge">Save 20%</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Pricing Cards Grid -->
+    <div class="plans-grid">
+      @for (plan of plans; track plan.id) {
+        <div class="plan-card" [class.popular]="plan.isPopular" [class.current]="plan.isCurrent">
+          @if (plan.isCurrent) {
+            <span class="current-badge">YOUR ACTIVE PLAN</span>
+          } @else if (plan.isPopular) {
+            <span class="popular-badge">RECOMMENDED FOR HOSPITALS</span>
+          }
+
+          <div class="plan-head">
+            <small class="badge-text">{{ plan.badge }}</small>
+            <h3>{{ plan.name }}</h3>
+            <p class="plan-desc">{{ plan.description }}</p>
+          </div>
+
+          <div class="pricing-tag">
+            <div class="price">
+              <b>${{ isAnnual() ? plan.annualPrice : plan.monthlyPrice }}</b>
+              <span>/ month</span>
+            </div>
+            <small class="billing-note">{{ isAnnual() ? 'Billed annually ($' + (plan.annualPrice * 12) + '/yr)' : 'Billed monthly' }}</small>
+          </div>
+
+          <ul class="feature-list">
+            @for (feat of plan.features; track feat) {
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>{{ feat }}</span>
+              </li>
+            }
+          </ul>
+
+          <button
+            type="button"
+            class="action-btn"
+            [class.current-btn]="plan.isCurrent"
+            [disabled]="plan.isCurrent || upgradingPlan() === plan.id"
+            (click)="selectPlan(plan)"
+          >
+            @if (upgradingPlan() === plan.id) {
+              <span>Updating Plan...</span>
+            } @else if (plan.isCurrent) {
+              <span>Current Subscription</span>
+            } @else {
+              <span>Upgrade to {{ plan.name }}</span>
+            }
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Billing History Table -->
+  <section class="invoices-section">
+    <div class="section-title-row">
+      <div>
+        <h2>Billing History & Invoices</h2>
+        <p>View past renewal statements and download PDF tax receipts.</p>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>INVOICE NUMBER</th>
+            <th>DATE</th>
+            <th>AMOUNT</th>
+            <th>STATUS</th>
+            <th>PAYMENT METHOD</th>
+            <th class="text-right">RECEIPT</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (inv of invoices; track inv.id) {
+            <tr>
+              <td>
+                <b class="invoice-no">{{ inv.invoiceNo }}</b>
+              </td>
+              <td>{{ inv.date | date: 'mediumDate' }}</td>
+              <td>
+                <b>{{ inv.amount | currency: 'USD' }}</b>
+              </td>
+              <td>
+                <span class="status-pill-paid">
+                  <span class="dot"></span>
+                  {{ inv.status }}
+                </span>
+              </td>
+              <td class="method-cell">{{ inv.method }}</td>
+              <td class="text-right">
+                <button type="button" class="download-pdf-btn" (click)="downloadInvoice(inv)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>PDF Receipt</span>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

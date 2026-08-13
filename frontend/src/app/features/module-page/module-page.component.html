@@ -1,0 +1,183 @@
+<header class="page">
+  <div>
+    <p>HOSPITAL OPERATIONS</p>
+    <h1>{{ config.title }}</h1>
+    <span>{{ config.description }}</span>
+  </div>
+  @if (
+    config.createLabel && definition && (!createPermission || auth.hasPermission(createPermission))
+  ) {
+    <button (click)="open()">{{ config.createLabel }}</button>
+  }
+</header>
+@if (config.endpoint) {
+  <section class="card">
+    <div class="tools">
+      @if (config.search) {
+        <label>Search <input [formControl]="search" /></label>
+      } @else {
+        <b>All records</b>
+      }
+      <button (click)="changePage(page())">Refresh</button>
+    </div>
+    @if (state$ | async; as state) {
+      @if (state.error) {
+        <div class="state error">Unable to load records.</div>
+      } @else if (state.data?.items?.length) {
+        <div class="table">
+          <table>
+            <thead>
+              <tr>
+                @for (column of config.columns; track column) {
+                  <th>{{ column }}</th>
+                }
+                @if (actions.length) {
+                  <th>Actions</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of state.data!.items; track item['id']) {
+                <tr>
+                  @for (column of config.columns; track column) {
+                    <td>{{ display(item[column]) }}</td>
+                  }
+                  @if (actions.length) {
+                    <td>
+                      @for (action of actions; track action.label) {
+                        @if (!action.permission || auth.hasPermission(action.permission)) {
+                          <button (click)="run(action, item)">{{ action.label }}</button>
+                        }
+                      }
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <footer>
+          <span>{{ state.data!.totalCount }} records</span>
+          <div>
+            <button [disabled]="!state.data!.hasPreviousPage" (click)="changePage(page() - 1)">
+              Previous</button
+            ><b>{{ state.data!.pageNumber }} / {{ state.data!.totalPages }}</b
+            ><button [disabled]="!state.data!.hasNextPage" (click)="changePage(page() + 1)">
+              Next
+            </button>
+          </div>
+        </footer>
+      } @else {
+        <div class="state">No records found.</div>
+      }
+    }
+  </section>
+} @else {
+  <section class="state-card">
+    <h2>{{ config.title }} workflow</h2>
+    <p>{{ config.description }}</p>
+  </section>
+}
+@if (modal() && definition) {
+  <div class="backdrop" (click)="close()">
+    <form class="modal" [formGroup]="form" (ngSubmit)="submit()" (click)="$event.stopPropagation()">
+      <header>
+        <h2>{{ config.createLabel }}</h2>
+        <button type="button" aria-label="Close" (click)="close()">×</button>
+      </header>
+      <div class="fields">
+        @for (field of definition.fields; track field.key) {
+          <label
+            >{{ field.label }}{{ field.required ? ' *' : '' }}
+            @if (field.type === 'select' || field.type === 'boolean') {
+              <select [formControlName]="field.key">
+                <option value="">Select {{ field.label.toLowerCase() }}</option>
+                @for (option of field.options; track option) {
+                  <option [value]="option">{{ option }}</option>
+                }
+              </select>
+            } @else if (
+              field.type === 'textarea' ||
+              field.type === 'json' ||
+              field.type === 'csv' ||
+              field.type === 'guid-list'
+            ) {
+              <textarea
+                [formControlName]="field.key"
+                [placeholder]="field.placeholder || ''"
+              ></textarea>
+            } @else {
+              <input [type]="field.type" [formControlName]="field.key" />
+            }
+          </label>
+          @if (fieldError(field, form)) {
+            <small class="field-error">{{ fieldError(field, form) }}</small>
+          }
+        }
+        @if (formError()) {
+          <p class="error">{{ formError() }}</p>
+        }
+      </div>
+      <footer>
+        <button type="button" class="cancel" (click)="close()">Cancel</button><span></span
+        ><button type="submit" [disabled]="saving() || form.invalid">
+          {{ saving() ? 'Saving…' : 'Save' }}
+        </button>
+      </footer>
+    </form>
+  </div>
+}
+@if (actionModal() && selectedAction(); as action) {
+  <div class="backdrop" (click)="closeAction()">
+    <form
+      class="modal"
+      [formGroup]="actionForm"
+      (ngSubmit)="submitAction()"
+      (click)="$event.stopPropagation()"
+    >
+      <header>
+        <h2>{{ action.label }}</h2>
+        <button type="button" aria-label="Close" (click)="closeAction()">×</button>
+      </header>
+      <div class="fields">
+        @if (action.confirm) {
+          <p>{{ action.confirm }}</p>
+        }
+        @for (field of action.fields; track field.key) {
+          <label
+            >{{ field.label }}{{ field.required ? ' *' : '' }}
+            @if (field.type === 'select' || field.type === 'boolean') {
+              <select [formControlName]="field.key">
+                <option value="">Select {{ field.label.toLowerCase() }}</option>
+                @for (option of field.options; track option) {
+                  <option [value]="option">{{ option }}</option>
+                }
+              </select>
+            } @else if (
+              field.type === 'textarea' ||
+              field.type === 'json' ||
+              field.type === 'csv' ||
+              field.type === 'guid-list'
+            ) {
+              <textarea [formControlName]="field.key"></textarea>
+            } @else {
+              <input [type]="field.type" [formControlName]="field.key" />
+            }
+          </label>
+          @if (fieldError(field, actionForm)) {
+            <small class="field-error">{{ fieldError(field, actionForm) }}</small>
+          }
+        }
+        @if (formError()) {
+          <p class="error">{{ formError() }}</p>
+        }
+      </div>
+      <footer>
+        <button type="button" class="cancel" (click)="closeAction()">Cancel</button><span></span
+        ><button type="submit" [disabled]="saving() || actionForm.invalid">
+          {{ saving() ? 'Saving…' : 'Confirm' }}
+        </button>
+      </footer>
+    </form>
+  </div>
+}

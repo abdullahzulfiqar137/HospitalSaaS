@@ -1,0 +1,251 @@
+<header class="page-head">
+  <div>
+    <p>SUPPLY OPERATIONS</p>
+    <h1>Inventory & suppliers</h1>
+    <span>Track stock levels and procurement partners.</span>
+  </div>
+  @if (tab() === 'inventory' && auth.hasPermission('Inventory.Create')) {
+    <button (click)="itemOpen.set(true)">+ New item</button>
+  } @else if (tab() === 'suppliers' && auth.hasPermission('Inventory.Create')) {
+    <button (click)="supplierOpen.set(true)">+ New supplier</button>
+  }
+</header>
+<nav class="tabs">
+  <a routerLink="/inventory" [class.active]="tab() === 'inventory'">Stock catalog</a
+  ><a routerLink="/suppliers" [class.active]="tab() === 'suppliers'">Suppliers</a
+  ><a routerLink="/purchase-orders">Purchase orders</a>
+</nav>
+<section class="metrics">
+  <div>
+    <small>ACTIVE ITEMS</small><b>{{ inventory().length }}</b>
+  </div>
+  <div>
+    <small>LOW STOCK</small><b class="warning">{{ lowStockCount() }}</b>
+  </div>
+  <div>
+    <small>SUPPLIERS</small><b>{{ suppliers().length }}</b>
+  </div>
+</section>
+<section class="card">
+  <div class="tools">
+    <label
+      ><span class="sr-only">Search</span
+      ><input
+        #query
+        placeholder="Search by name, code, phone or email"
+        (input)="search.set(query.value)" /></label
+    ><button (click)="load()">Refresh</button>
+  </div>
+  @if (loading()) {
+    <div class="state">Loading inventory workspace…</div>
+  } @else if (tab() === 'inventory') {
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Item</th>
+            <th>Unit</th>
+            <th>Current stock</th>
+            <th>Minimum</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of filteredItems(); track item.id) {
+            <tr>
+              <td>
+                <b>{{ item.sku }}</b>
+              </td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.unit }}</td>
+              <td>
+                <b>{{ stocks()[item.id] ?? '—' }}</b>
+              </td>
+              <td>{{ item.minimumStock }}</td>
+              <td>
+                <span class="status" [class.low]="(stocks()[item.id] ?? 0) <= item.minimumStock">{{
+                  (stocks()[item.id] ?? 0) <= item.minimumStock ? 'Low stock' : 'Healthy'
+                }}</span>
+              </td>
+              <td>
+                @if (auth.hasPermission('Inventory.AdjustStock')) {
+                  <button class="link" (click)="openAdjustment(item)">Adjust</button>
+                }
+                @if (auth.hasPermission('Inventory.Update')) {
+                  <button
+                    class="link danger"
+                    (click)="pendingDelete.set({ type: 'item', id: item.id, name: item.name })"
+                  >
+                    Remove
+                  </button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="state">No inventory items found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Supplier</th>
+            <th>Contact</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (supplier of filteredSuppliers(); track supplier.id) {
+            <tr>
+              <td>
+                <b>{{ supplier.name }}</b>
+              </td>
+              <td>{{ supplier.contactName || '—' }}</td>
+              <td>{{ supplier.phone || '—' }}</td>
+              <td>{{ supplier.email || '—' }}</td>
+              <td>{{ supplier.address || '—' }}</td>
+              <td>
+                <span class="status">{{ supplier.isActive ? 'Active' : 'Inactive' }}</span>
+              </td>
+              <td>
+                @if (auth.hasPermission('Inventory.Update')) {
+                  <button
+                    class="link danger"
+                    (click)="
+                      pendingDelete.set({ type: 'supplier', id: supplier.id, name: supplier.name })
+                    "
+                  >
+                    Remove
+                  </button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="state">No suppliers found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
+
+@if (itemOpen()) {
+  <div class="backdrop">
+    <form
+      class="modal"
+      [formGroup]="itemForm"
+      (ngSubmit)="createItem()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="item-title"
+    >
+      <header>
+        <h2 id="item-title">Add inventory item</h2>
+        <button type="button" aria-label="Close" (click)="itemOpen.set(false)">×</button>
+      </header>
+      <div class="fields">
+        <label>SKU *<input formControlName="sku" /></label
+        ><label>Item name *<input formControlName="name" /></label
+        ><label>Unit *<input formControlName="unit" placeholder="box, piece, litre" /></label
+        ><label
+          >Minimum stock *<input type="number" min="0" formControlName="minimumStock"
+        /></label>
+      </div>
+      <footer>
+        <button type="button" class="secondary" (click)="itemOpen.set(false)">Cancel</button
+        ><button [disabled]="saving() || itemForm.invalid">Create item</button>
+      </footer>
+    </form>
+  </div>
+}
+@if (supplierOpen()) {
+  <div class="backdrop">
+    <form
+      class="modal"
+      [formGroup]="supplierForm"
+      (ngSubmit)="createSupplier()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="supplier-title"
+    >
+      <header>
+        <h2 id="supplier-title">Add supplier</h2>
+        <button type="button" aria-label="Close" (click)="supplierOpen.set(false)">×</button>
+      </header>
+      <div class="fields">
+        <label>Company name *<input formControlName="name" /></label
+        ><label>Contact person<input formControlName="contactName" /></label
+        ><label>Phone<input formControlName="phone" /></label
+        ><label>Email<input type="email" formControlName="email" /></label
+        ><label class="wide">Address<textarea rows="3" formControlName="address"></textarea></label>
+      </div>
+      <footer>
+        <button type="button" class="secondary" (click)="supplierOpen.set(false)">Cancel</button
+        ><button [disabled]="saving() || supplierForm.invalid">Create supplier</button>
+      </footer>
+    </form>
+  </div>
+}
+@if (adjustmentOpen()) {
+  <div class="backdrop">
+    <form
+      class="modal small"
+      [formGroup]="adjustmentForm"
+      (ngSubmit)="adjust()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="adjust-title"
+    >
+      <header>
+        <div>
+          <small>STOCK ADJUSTMENT</small>
+          <h2 id="adjust-title">{{ selectedItem()?.name }}</h2>
+        </div>
+        <button type="button" aria-label="Close" (click)="adjustmentOpen.set(false)">×</button>
+      </header>
+      <div class="fields single">
+        <p>
+          Current stock: <b>{{ stocks()[selectedItem()!.id] ?? 0 }}</b>
+        </p>
+        <label
+          >Quantity change *<input type="number" formControlName="quantity" /><small
+            >Use a negative number to remove stock.</small
+          ></label
+        ><label>Reason *<textarea rows="3" formControlName="reason"></textarea></label>
+      </div>
+      <footer>
+        <button type="button" class="secondary" (click)="adjustmentOpen.set(false)">Cancel</button
+        ><button
+          [disabled]="
+            saving() || adjustmentForm.invalid || adjustmentForm.controls.quantity.value === 0
+          "
+        >
+          Update stock
+        </button>
+      </footer>
+    </form>
+  </div>
+}
+@if (pendingDelete(); as target) {
+  <app-confirmation-dialog
+    title="Remove record?"
+    [message]="target.name + ' will be deactivated and removed from active operations.'"
+    confirmLabel="Remove"
+    [busy]="saving()"
+    (cancelled)="pendingDelete.set(null)"
+    (confirmed)="confirmDelete()"
+  />
+}

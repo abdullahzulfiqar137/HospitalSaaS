@@ -1,0 +1,200 @@
+<header class="page-header">
+  <div>
+    <p>INPATIENT OPERATIONS</p>
+    <h1>Admissions</h1>
+    <span>Admit patients, manage transfers, and review movement history.</span>
+  </div>
+</header>
+
+<section class="lookup card">
+  <div>
+    <label for="admission-id">Find an admission</label
+    ><small>Enter the admission GUID to open its current status and history.</small>
+  </div>
+  <div class="lookup-control">
+    <input
+      id="admission-id"
+      [formControl]="lookup"
+      placeholder="Admission GUID"
+      (keyup.enter)="find()"
+    /><button (click)="find()" [disabled]="loading()">
+      {{ loading() ? 'Finding…' : 'Find admission' }}
+    </button>
+  </div>
+  @if (lookupError()) {
+    <p class="form-error">{{ lookupError() }}</p>
+  }
+</section>
+
+@if (record(); as item) {
+  <section class="card admission">
+    <header>
+      <div>
+        <p>CURRENT ADMISSION</p>
+        <h2>{{ item.admissionNumber }}</h2>
+      </div>
+      <span class="status" [class.discharged]="item.status === 'Discharged'">{{
+        item.status
+      }}</span>
+    </header>
+    <div class="details">
+      <div>
+        <small>Patient ID</small><b>{{ item.patientId }}</b>
+      </div>
+      <div>
+        <small>Doctor ID</small><b>{{ item.doctorId }}</b>
+      </div>
+      <div>
+        <small>Admission type</small><b>{{ item.admissionType }}</b>
+      </div>
+      <div>
+        <small>Admitted</small><b>{{ item.admissionDateUtc | date: 'medium' }}</b>
+      </div>
+      <div>
+        <small>Ward</small><b>{{ item.wardId }}</b>
+      </div>
+      <div>
+        <small>Room / Bed</small><b>{{ item.roomId }} / {{ item.bedId }}</b>
+      </div>
+      <div class="wide">
+        <small>Reason</small><b>{{ item.reason }}</b>
+      </div>
+    </div>
+    @if (item.status !== 'Discharged') {
+      <footer>
+        <button class="secondary" (click)="openTransfer()">Transfer patient</button
+        ><button class="danger" (click)="dischargeOpen.set(true)">Discharge patient</button>
+      </footer>
+    }
+  </section>
+
+  <section class="card timeline">
+    <header>
+      <div>
+        <p>MOVEMENT HISTORY</p>
+        <h2>Transfers</h2>
+      </div>
+      <span>{{ history().length }} records</span>
+    </header>
+    @for (entry of history(); track entry.id) {
+      <article>
+        <i></i>
+        <div>
+          <b>{{ entry.transferredAtUtc | date: 'medium' }}</b
+          ><span>Ward {{ entry.fromWardId }} → {{ entry.toWardId }}</span
+          ><small
+            >Room {{ entry.fromRoomId }} / Bed {{ entry.fromBedId }} → Room {{ entry.toRoomId }} /
+            Bed {{ entry.toBedId }}</small
+          >
+          @if (entry.reason) {
+            <p>{{ entry.reason }}</p>
+          }
+        </div>
+      </article>
+    } @empty {
+      <div class="empty">No transfers recorded for this admission.</div>
+    }
+  </section>
+}
+
+<form class="card create" [formGroup]="form" (ngSubmit)="admit()">
+  <header>
+    <div>
+      <p>NEW ADMISSION</p>
+      <h2>Admit patient</h2>
+      <span>All identifiers must belong to the current hospital tenant.</span>
+    </div>
+  </header>
+  <div class="grid">
+    <label>Patient ID *<input formControlName="patientId" placeholder="Patient GUID" /></label
+    ><label>Doctor ID *<input formControlName="doctorId" placeholder="Doctor GUID" /></label>
+    <label
+      >Admission type *<select formControlName="admissionType">
+        <option>Emergency</option>
+        <option>Elective</option>
+        <option>Observation</option>
+      </select></label
+    >
+    <label>Ward ID *<input formControlName="wardId" placeholder="Ward GUID" /></label
+    ><label>Room ID *<input formControlName="roomId" placeholder="Room GUID" /></label
+    ><label>Bed ID *<input formControlName="bedId" placeholder="Bed GUID" /></label>
+    <label class="wide"
+      >Reason for admission *<textarea
+        formControlName="reason"
+        rows="3"
+        placeholder="Clinical reason for admission"
+      ></textarea>
+    </label>
+  </div>
+  <footer>
+    <span>Fields marked * are required.</span
+    ><button type="submit" [disabled]="form.invalid || saving()">
+      {{ saving() ? 'Admitting…' : 'Admit patient' }}
+    </button>
+  </footer>
+</form>
+
+@if (transferOpen()) {
+  <div class="backdrop" role="presentation" (click)="transferOpen.set(false)">
+    <form
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="transfer-title"
+      [formGroup]="transferForm"
+      (ngSubmit)="transfer()"
+      (click)="$event.stopPropagation()"
+    >
+      <header>
+        <div>
+          <p>BED MOVEMENT</p>
+          <h2 id="transfer-title">Transfer patient</h2>
+        </div>
+        <button
+          type="button"
+          class="close"
+          aria-label="Close transfer dialog"
+          (click)="transferOpen.set(false)"
+        >
+          ×
+        </button>
+      </header>
+      <div class="grid">
+        <label>New ward ID *<input formControlName="wardId" /></label
+        ><label>New room ID *<input formControlName="roomId" /></label
+        ><label>New bed ID *<input formControlName="bedId" /></label
+        ><label class="wide">Reason<textarea formControlName="reason" rows="3"></textarea></label>
+      </div>
+      <footer>
+        <button type="button" class="secondary" (click)="transferOpen.set(false)">Cancel</button
+        ><button type="submit" [disabled]="transferForm.invalid || saving()">
+          {{ saving() ? 'Transferring…' : 'Confirm transfer' }}
+        </button>
+      </footer>
+    </form>
+  </div>
+}
+@if (dischargeOpen()) {
+  <div class="backdrop" role="presentation" (click)="dischargeOpen.set(false)">
+    <section
+      class="modal confirm"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="discharge-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="warning">!</div>
+      <h2 id="discharge-title">Discharge patient?</h2>
+      <p>
+        This will close admission <b>{{ record()?.admissionNumber }}</b> and release its assigned
+        bed.
+      </p>
+      <footer>
+        <button class="secondary" (click)="dischargeOpen.set(false)">Cancel</button
+        ><button class="danger" (click)="discharge()" [disabled]="saving()">
+          {{ saving() ? 'Discharging…' : 'Confirm discharge' }}
+        </button>
+      </footer>
+    </section>
+  </div>
+}
