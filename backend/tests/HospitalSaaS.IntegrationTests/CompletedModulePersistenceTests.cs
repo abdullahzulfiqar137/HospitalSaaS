@@ -9,8 +9,9 @@ namespace HospitalSaaS.IntegrationTests;
 
 public sealed class CompletedModulePersistenceTests
 {
-    private const string ConnectionString =
-        "Server=DESKTOP-O8LF2FG;Database=HospitalSaaSDb;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True;";
+    private static string ConnectionString =>
+        Environment.GetEnvironmentVariable("TEST_SQL_CONNECTION")
+        ?? "Server=DESKTOP-O8LF2FG;Database=HospitalSaaSDb;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True;";
 
     [Fact]
     public async Task Lab_catalog_is_persisted_and_tenant_isolated()
