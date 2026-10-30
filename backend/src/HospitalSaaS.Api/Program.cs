@@ -1,6 +1,7 @@
 using HospitalSaaS.Api.Extensions;
 using HospitalSaaS.Application;
 using HospitalSaaS.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 builder
@@ -10,8 +11,11 @@ builder
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
-    await scope
-        .ServiceProvider.GetRequiredService<HospitalSaaS.Infrastructure.Persistence.Seed.DatabaseSeeder>()
+    var services = scope.ServiceProvider;
+    var db = services.GetRequiredService<HospitalSaaS.Infrastructure.Persistence.HospitalDbContext>();
+    await db.Database.MigrateAsync();
+    await services
+        .GetRequiredService<HospitalSaaS.Infrastructure.Persistence.Seed.DatabaseSeeder>()
         .SeedAsync();
 }
 app.UseApiPipeline();
