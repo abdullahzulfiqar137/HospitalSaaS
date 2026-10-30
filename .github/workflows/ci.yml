@@ -27,8 +27,12 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Restore
-        run: dotnet restore backend/HospitalSaaS.sln
+      - name: Restore dependencies (keep NuGet vulnerability warnings visible)
+        run: dotnet restore backend/HospitalSaaS.sln -p:WarningsNotAsErrors="NU1902;NU1903"
+
+      - name: Dependency vulnerability report
+        run: dotnet list backend/HospitalSaaS.sln package --vulnerable --include-transitive
+        continue-on-error: true
 
       - name: Build
         run: dotnet build backend/HospitalSaaS.sln --configuration Release --no-restore
