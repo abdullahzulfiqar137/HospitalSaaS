@@ -30,6 +30,12 @@ A healthcare operations application built with Angular 19, .NET 10, Entity Frame
 | Access control | Role-based access for administrative and clinical staff |
 | Tenant data | Multi-tenant data access patterns |
 
+## Demo walkthrough
+
+A recorded walkthrough is available in the portfolio repository:
+
+[Watch the Hospital SaaS demo](https://raw.githubusercontent.com/abdullahzulfiqar137/Portfolio/main/public/assets/videos/hospital-saas-demo.mp4)
+
 ## Architecture at a glance
 
 The repository contains an Angular frontend and an ASP.NET Core API. Entity Framework Core provides the data-access layer to Microsoft SQL Server.
@@ -109,6 +115,10 @@ Open [http://localhost:4200](http://localhost:4200).
 
 - [Backend setup and API notes](backend/README.md)
 - [Frontend setup notes](frontend/README.md)
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for vulnerability reporting and healthcare-data safety notes.
 
 ## License
 
