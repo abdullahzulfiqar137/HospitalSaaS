@@ -1,95 +1,82 @@
-# 🏥 Hospital Management SaaS Platform
+# Hospital Management SaaS Platform
 
-> **A Modern, Multi-Tenant Healthcare Operations Console & Medical SaaS Workspace**
+A healthcare operations application built with **Angular 19**, **.NET 10**, Entity Framework Core, and Microsoft SQL Server.
 
-Built with **Angular 19** (Signals & Standalone Architecture) and **.NET 10 Web API** with Entity Framework Core & SQL Server.
+## Features
 
----
+- Patient registration and identity-document input with country-specific formatting
+- Doctor and workforce administration, specialties, and consultation fees
+- Patient-doctor appointment scheduling
+- Inpatient admissions, beds, rooms, wards, and occupancy tracking
+- Clinical encounters, diagnosis coding, examinations, and prescriptions
+- Laboratory and radiology orders and result entry
+- Pharmacy inventory, suppliers, and procurement workflows
+- Billing, invoices, payments, and insurance information
+- Role-based access for administrative and clinical staff
+- Multi-tenant data access patterns
 
-## 🌟 Key Features
-
-- 🏥 **Patient Management & International Identity Validation**:
-  - Live CNIC / Document ID masking with dashes (`-`) and country-specific `maxlength` limits.
-  - HD Flag selectors for Pakistan, USA, UAE, India, Malaysia, Brazil, Saudi Arabia, Turkey, Egypt, Indonesia.
-  - Dynamic identity example placeholders based on selected country.
-
-- 🩺 **Doctor & Workforce Administration**:
-  - Specialty assignment, consultation fee scheduling, and license governance.
-  - Interactive doctor registration modals.
-
-- 📅 **Appointments & Scheduling**:
-  - Direct patient-doctor booking workflows across Cardiology, Neurology, Orthopedics, Pediatrics, Emergency, and General Practice.
-
-- 🛌 **Inpatient Admissions & Ward Operations**:
-  - Bed, room, and ward management (General Ward, ICU, CCU) with real-time occupancy tracking.
-
-- 📋 **Clinical encounters & Prescriptions**:
-  - Chief complaints, ICD-10 diagnostic coding, physical examinations, and digital prescriptions.
-
-- 🧪 **Diagnostics, Laboratory & Radiology**:
-  - Lab test catalog (CBC, Lipid Panel, Blood Glucose), radiology imaging orders (X-Ray, MRI, CT Scan), and result entry.
-
-- 💊 **Pharmacy & Medical Inventory Procurement**:
-  - Medicine stock management, reorder level tracking, supplier catalog, and purchase order workflow.
-
-- 💳 **Billing, Invoicing & Financial Governance**:
-  - Automated invoice generation, partial/full payment recording, and insurance policy coverage.
-
-- 🔐 **Role-Based Governance & Executive Security**:
-  - 1-Click Role Presets (Admin, Doctor, Nurse, Lab Tech, Pharmacist, Billing Clerk, Receptionist).
-  - 9 Categorized Permission Matrix groups with fine-grained policy toggles.
-  - Executive Glassmorphic User Profile menu & sticky navigation.
-
----
-
-## 🛠️ Technology Stack
+## Technology stack
 
 | Layer | Technology |
-| :--- | :--- |
-| **Frontend Framework** | Angular 19 (Standalone Components, Signals, Reactive Forms) |
-| **Styling** | Vanilla SCSS, Glassmorphism Design System, Plus Jakarta Sans & Outfit Fonts |
-| **Backend API** | .NET 10 Web API (C#) |
-| **ORM / Database** | Entity Framework Core 10, SQL Server (`HospitalSaaSDb`) |
-| **Security** | JWT Bearer Authentication, Multi-Tenant Query Filtering |
+| --- | --- |
+| Frontend | Angular 19, TypeScript, Signals, Standalone Components |
+| Styling | SCSS |
+| Backend | .NET 10, ASP.NET Core Web API |
+| Data access | Entity Framework Core |
+| Database | Microsoft SQL Server |
+| Security | JWT bearer authentication and tenant-aware query filtering |
 
----
+## Repository structure
 
-## 🚀 Getting Started
+```text
+.
+├── backend/
+│   └── src/
+│       └── HospitalSaaS.Api/
+└── frontend/
+```
 
-### 1. Prerequisites
-- [.NET 10 SDK](https://dotnet.microsoft.com/)
-- [Node.js v18+](https://nodejs.org/)
-- SQL Server (LocalDB or Express / Enterprise)
+## Prerequisites
 
-### 2. Backend Setup
+- .NET 10 SDK
+- Node.js version supported by Angular 19
+- npm
+- SQL Server, LocalDB, or SQL Server Express
+
+## Run locally
+
+### 1. Configure the database
+
+Review the backend configuration and set a local SQL Server connection string using development-only settings or environment variables. Do not commit real credentials.
+
+### 2. Apply database migrations and start the API
+
 ```bash
 cd backend/src/HospitalSaaS.Api
 dotnet ef database update
 dotnet run
 ```
-> The API server will start on `https://localhost:7001` or `http://localhost:5000`.
 
-### 3. Frontend Setup
+The API is documented by the project as using https://localhost:7001 or http://localhost:5000. Confirm the actual bound address in the application startup output.
+
+### 3. Install and start the frontend
+
 ```bash
 cd frontend
 npm install
 npm start
 ```
-> Navigate to `http://localhost:4200/` in your browser.
 
----
+Open http://localhost:4200/ in your browser.
 
-## 🔐 System Logins (Default Seed Data)
+## Demo accounts and credential safety
 
-| Role | Email | Password |
-| :--- | :--- | :--- |
-| **Hospital Administrator** | `admin@hospital.com` | `Password123!` |
-| **Doctor** | `doctor@hospital.com` | `Password123!` |
-| **Lab Technician** | `labtech@hospital.com` | `Password123!` |
-| **Pharmacist** | `pharmacist@hospital.com` | `Password123!` |
-| **Patient** | `patient@hospital.com` | `Password123!` |
+Earlier versions of this README published example email addresses and a shared default password for several seeded roles. Those passwords have been removed from public documentation.
 
----
+For local evaluation, inspect the development-only seed configuration and create unique local credentials. Do not reuse sample passwords on a deployed system. Before any public deployment, disable or replace predictable seeded accounts, rotate any credentials that may have been used outside a local environment, and provision users through a secure administrator workflow.
 
-## 📄 License
-This project is open source and available under the [MIT License](LICENSE).
+**Healthcare data warning:** Use synthetic test data only in development and demonstrations. Do not commit patient information, medical records, access tokens, connection strings, or other sensitive data.
+
+## License
+
+The previous README identified the project as MIT-licensed. Verify that a matching `LICENSE` file exists in the repository before redistributing the project under that license.
