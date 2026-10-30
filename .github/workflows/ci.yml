@@ -18,6 +18,23 @@ jobs:
   backend:
     name: .NET 10 build and tests
     runs-on: ubuntu-latest
+    env:
+      ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=HospitalSaaSDb;User Id=sa;Password=HospitalSaaS_CI_2026!Secure;Encrypt=False;TrustServerCertificate=True;"
+      TEST_SQL_CONNECTION: "Server=localhost,1433;Database=HospitalSaaSDb;User Id=sa;Password=HospitalSaaS_CI_2026!Secure;Encrypt=False;TrustServerCertificate=True;"
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: "HospitalSaaS_CI_2026!Secure"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'HospitalSaaS_CI_2026!Secure' -C -Q 'SELECT 1' || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 30
+          --health-start-period 30s
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,6 +50,12 @@ jobs:
       - name: Dependency vulnerability report
         run: dotnet list backend/HospitalSaaS.sln package --vulnerable --include-transitive
         continue-on-error: true
+
+      - name: Install EF Core CLI
+        run: dotnet tool install --global dotnet-ef --version 10.0.10
+
+      - name: Apply database migrations
+        run: dotnet ef database update --project backend/src/HospitalSaaS.Infrastructure/HospitalSaaS.Infrastructure.csproj --startup-project backend/src/HospitalSaaS.Api/HospitalSaaS.Api.csproj --configuration Release
 
       - name: Build
         run: dotnet build backend/HospitalSaaS.sln --configuration Release --no-restore
