@@ -1,19 +1,46 @@
 # Hospital Management SaaS Platform
 
-A healthcare operations application built with **Angular 19**, **.NET 10**, Entity Framework Core, and Microsoft SQL Server.
+<p align="center">
+  <strong>Healthcare operations management built with Angular and ASP.NET Core</strong>
+</p>
 
-## Features
+<p align="center">
+  <img src="https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white" alt=".NET 10" />
+  <img src="https://img.shields.io/badge/Angular-19-DD0031?logo=angular&logoColor=white" alt="Angular 19" />
+  <img src="https://img.shields.io/badge/SQL_Server-Database-CC2927?logo=microsoftsqlserver&logoColor=white" alt="SQL Server" />
+  <img src="https://img.shields.io/badge/Entity_Framework_Core-ORM-512BD4" alt="Entity Framework Core" />
+</p>
 
-- Patient registration and identity-document input with country-specific formatting
-- Doctor and workforce administration, specialties, and consultation fees
-- Patient-doctor appointment scheduling
-- Inpatient admissions, beds, rooms, wards, and occupancy tracking
-- Clinical encounters, diagnosis coding, examinations, and prescriptions
-- Laboratory and radiology orders and result entry
-- Pharmacy inventory, suppliers, and procurement workflows
-- Billing, invoices, payments, and insurance information
-- Role-based access for administrative and clinical staff
-- Multi-tenant data access patterns
+## Overview
+
+A healthcare operations application built with Angular 19, .NET 10, Entity Framework Core, and Microsoft SQL Server. The solution covers patient administration, clinical workflows, appointments, inpatient operations, diagnostics, pharmacy, and billing.
+
+## Core modules
+
+| Module | Scope |
+| --- | --- |
+| Patient administration | Patient registration and identity-document input with country-specific formatting |
+| Workforce | Doctor and staff administration, specialties, and consultation fees |
+| Appointments | Patient-doctor appointment scheduling |
+| Inpatient | Admissions, beds, rooms, wards, and occupancy tracking |
+| Clinical | Encounters, diagnosis coding, examinations, and prescriptions |
+| Diagnostics | Laboratory and radiology orders and result entry |
+| Pharmacy | Inventory, suppliers, and procurement workflows |
+| Billing | Invoices, payments, and insurance information |
+| Access control | Role-based access for administrative and clinical staff |
+| Tenant data | Multi-tenant data access patterns |
+
+## Architecture at a glance
+
+The repository contains an Angular frontend and an ASP.NET Core API. Entity Framework Core provides the data-access layer to Microsoft SQL Server.
+
+```mermaid
+flowchart LR
+    Staff[Hospital Staff] --> UI[Angular 19 Frontend]
+    UI -->|HTTPS / API requests| API[ASP.NET Core .NET 10 API]
+    API --> DATA[Entity Framework Core]
+    DATA --> DB[(SQL Server)]
+```
 
 ## Technology stack
 
@@ -31,25 +58,27 @@ A healthcare operations application built with **Angular 19**, **.NET 10**, Enti
 ```text
 .
 ├── backend/
+│   ├── HospitalSaaS.sln
 │   └── src/
 │       └── HospitalSaaS.Api/
 └── frontend/
+    ├── Dockerfile
+    └── README.md
 ```
 
 ## Prerequisites
 
 - .NET 10 SDK
-- Node.js version supported by Angular 19
-- npm
+- Node.js and npm compatible with Angular 19
 - SQL Server, LocalDB, or SQL Server Express
 
 ## Run locally
 
 ### 1. Configure the database
 
-Review the backend configuration and set a local SQL Server connection string using development-only settings or environment variables. Do not commit real credentials.
+Review the backend development configuration and set a local SQL Server connection string using development-only settings or environment variables. Never commit real credentials.
 
-### 2. Apply database migrations and start the API
+### 2. Apply migrations and start the API
 
 ```bash
 cd backend/src/HospitalSaaS.Api
@@ -57,9 +86,9 @@ dotnet ef database update
 dotnet run
 ```
 
-The API is documented by the project as using https://localhost:7001 or http://localhost:5000. Confirm the actual bound address in the application startup output.
+The project documentation identifies https://localhost:7001 or http://localhost:5000 as API addresses. Confirm the actual bound address in application startup output.
 
-### 3. Install and start the frontend
+### 3. Start the frontend
 
 ```bash
 cd frontend
@@ -67,16 +96,20 @@ npm install
 npm start
 ```
 
-Open http://localhost:4200/ in your browser.
+Open [http://localhost:4200](http://localhost:4200).
 
-## Demo accounts and credential safety
+## Privacy and security
 
-Earlier versions of this README published example email addresses and a shared default password for several seeded roles. Those passwords have been removed from public documentation.
+- Use synthetic test data only in development and demonstrations.
+- Do not commit patient information, medical records, access tokens, connection strings, or other sensitive data.
+- Use unique development credentials and secure production identity provisioning.
+- Earlier shared demo passwords have been removed from public documentation. Rotate any credential that may have been used outside a local environment and disable predictable seeded accounts before deployment.
 
-For local evaluation, inspect the development-only seed configuration and create unique local credentials. Do not reuse sample passwords on a deployed system. Before any public deployment, disable or replace predictable seeded accounts, rotate any credentials that may have been used outside a local environment, and provision users through a secure administrator workflow.
+## Further documentation
 
-**Healthcare data warning:** Use synthetic test data only in development and demonstrations. Do not commit patient information, medical records, access tokens, connection strings, or other sensitive data.
+- [Backend setup and API notes](backend/README.md)
+- [Frontend setup notes](frontend/README.md)
 
 ## License
 
-The previous README identified the project as MIT-licensed. Verify that a matching `LICENSE` file exists in the repository before redistributing the project under that license.
+The previous README identified the project as MIT-licensed. Verify that a matching `LICENSE` file exists before redistributing the project under that license.
