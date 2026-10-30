@@ -21,4 +21,8 @@
     <ProjectReference Include="..\HospitalSaaS.Infrastructure\HospitalSaaS.Infrastructure.csproj" />
     <ProjectReference Include="..\HospitalSaaS.Contracts\HospitalSaaS.Contracts.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Pin the transitive PKCS dependency to the patched .NET 10 line. -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.10" />
+  </ItemGroup>
 </Project>
