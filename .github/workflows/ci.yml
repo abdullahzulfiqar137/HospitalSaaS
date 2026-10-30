@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: hospital-saas-ci-${{ github.ref }}
+  group: hospital-saas-ci-sqlserver-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
