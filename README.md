@@ -1,5 +1,7 @@
 # Hospital Management SaaS Platform
 
+[![Hospital SaaS CI](https://github.com/abdullahzulfiqar137/HospitalSaaS/actions/workflows/ci.yml/badge.svg)](https://github.com/abdullahzulfiqar137/HospitalSaaS/actions/workflows/ci.yml)
+
 <p align="center">
   <strong>Healthcare operations management built with Angular and ASP.NET Core</strong>
 </p>
